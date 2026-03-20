@@ -156,7 +156,7 @@ loginForm.addEventListener('submit', async (e) => {
 
     // Network Request to Backend API
     try {
-        const response = await fetch('https://safegig-pink.vercel.app/api/auth/login', {
+        const response = await fetch('https://giguard.onrender.com/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
