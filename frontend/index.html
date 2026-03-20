@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigGuard — AI-Powered Parametric Insurance for Gig Workers</title>
+    <meta name="description" content="GigGuard uses AI risk engines, geospatial clustering, and automated claims to protect gig workers with intelligent parametric insurance.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ========== NAVIGATION ========== -->
+    <nav id="navbar" class="navbar">
+        <div class="nav-brand">GigGuard</div>
+        <div class="nav-links">
+            <a href="#architecture">Architecture</a>
+            <a href="#risk-map">Risk Map</a>
+            <a href="#features">Features</a>
+            <a href="#simulation">Simulation</a>
+            <a href="#tech-stack">Stack</a>
+            <a href="auth.html" style="text-decoration: none;"><button class="btn-cta-nav">Login by GigGuard</button></a>
+        </div>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- ========== SECTION 1: HERO — 3D System Overview ========== -->
+    <section id="hero" class="hero-section">
+        <!-- Three.js canvas for 3D city grid -->
+        <canvas id="heroCanvas" class="hero-canvas"></canvas>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">AI-Powered Parametric Insurance</div>
+            <h1 class="hero-title">
+                <span class="line">AI-Powered Insurance</span>
+                <span class="line gradient-text">for Gig Workers</span>
+            </h1>
+            <p class="hero-subtitle">Predict. Protect. Payout.</p>
+            <div class="hero-actions">
+                <button class="btn-primary" onclick="document.getElementById('architecture').scrollIntoView({behavior:'smooth'})">
+                    <span>View System Architecture</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+                <button class="btn-secondary" id="btnSimulateDisruption">
+                    <span>Simulate Disruption</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+            </div>
+            <!-- Live Stats Bar -->
+            <div class="hero-stats">
+                <div class="stat"><span class="stat-value" id="heroWorkers">2,847</span><span class="stat-label">Active Workers</span></div>
+                <div class="stat"><span class="stat-value" id="heroClaims">156</span><span class="stat-label">Claims Today</span></div>
+                <div class="stat"><span class="stat-value" id="heroUptime">99.97%</span><span class="stat-label">System Uptime</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 2: SYSTEM ARCHITECTURE FLOW ========== -->
+    <section id="architecture" class="section arch-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">System Architecture</span>
+                <h2 class="section-title">How the Platform Works</h2>
+                <p class="section-desc">End-to-end pipeline from worker activity to automated payout</p>
+            </div>
+            <div class="arch-flow" id="archFlow">
+                <!-- Architecture nodes connected by animated data lines -->
+                <div class="arch-node" data-step="1">
+                    <div class="node-icon">📱</div>
+                    <h3>Gig Worker App</h3>
+                    <p>Workers report conditions and submit delivery data in real-time.</p>
+                </div>
+                <div class="arch-connector"><div class="data-pulse"></div></div>
+                <div class="arch-node" data-step="2">
+                    <div class="node-icon">⚙️</div>
+                    <h3>Backend API</h3>
+                    <p>Express + Node.js REST API processes incoming worker signals.</p>
+                </div>
+                <div class="arch-connector"><div class="data-pulse"></div></div>
+                <div class="arch-node" data-step="3">
+                    <div class="node-icon">🧠</div>
+                    <h3>AI Risk Engine</h3>
+                    <p>Analyzes weather, worker reports, and delivery activity to detect disruptions.</p>
+                </div>
+                <div class="arch-connector"><div class="data-pulse"></div></div>
+                <div class="arch-node" data-step="4">
+                    <div class="node-icon">📍</div>
+                    <h3>Cluster Detection</h3>
+                    <p>Geospatial clustering groups affected workers by delivery zone.</p>
+                </div>
+                <div class="arch-connector"><div class="data-pulse"></div></div>
+                <div class="arch-node" data-step="5">
+                    <div class="node-icon">✅</div>
+                    <h3>Claim Engine</h3>
+                    <p>Auto-validates claims when disruption signals exceed threshold.</p>
+                </div>
+                <div class="arch-connector"><div class="data-pulse"></div></div>
+                <div class="arch-node" data-step="6">
+                    <div class="node-icon">💰</div>
+                    <h3>Wallet Payout</h3>
+                    <p>Instant credit to worker digital wallets upon claim approval.</p>
+                </div>
+                <div class="arch-connector"><div class="data-pulse"></div></div>
+                <div class="arch-node" data-step="7">
+                    <div class="node-icon">📊</div>
+                    <h3>Admin Dashboard</h3>
+                    <p>Ops team monitors claims, payouts, and system health in real-time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 3: LIVE RISK MAP PREVIEW ========== -->
+    <section id="risk-map" class="section map-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Risk Intelligence</span>
+                <h2 class="section-title">Live Risk Map Preview</h2>
+                <p class="section-desc">Real-time geospatial disruption detection across delivery zones</p>
+            </div>
+            <div class="map-wrapper">
+                <div class="map-controls">
+                    <button class="map-btn active" id="btnNormal" onclick="setMapState('normal')">Normal</button>
+                    <button class="map-btn" id="btnRain" onclick="setMapState('rain')">☔ Simulate Rain</button>
+                    <button class="map-btn" id="btnSurge" onclick="setMapState('surge')">⚡ Surge Event</button>
+                </div>
+                <div class="risk-map-container" id="riskMapContainer">
+                    <canvas id="riskMapCanvas"></canvas>
+                    <!-- Map Legend -->
+                    <div class="map-legend">
+                        <div class="legend-item"><span class="legend-dot green"></span> Safe</div>
+                        <div class="legend-item"><span class="legend-dot yellow"></span> Medium Risk</div>
+                        <div class="legend-item"><span class="legend-dot red"></span> Disruption</div>
+                    </div>
+                    <!-- Map Status -->
+                    <div class="map-status" id="mapStatus">
+                        <span class="status-dot green"></span> All zones operational
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 4: CORE PLATFORM FEATURES ========== -->
+    <section id="features" class="section features-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Platform Capabilities</span>
+                <h2 class="section-title">Core Platform Features</h2>
+                <p class="section-desc">Every component maps to a real subsystem in the GigGuard architecture</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card" data-feature="geo">
+                    <div class="feature-glow"></div>
+                    <div class="feature-icon">🌐</div>
+                    <h3>Geo-Cluster Risk Detection</h3>
+                    <p>DBSCAN-based geospatial clustering identifies groups of affected workers within disruption zones.</p>
+                    <div class="feature-diagram">
+                        <div class="fd-node"></div><div class="fd-line"></div>
+                        <div class="fd-node active"></div><div class="fd-line"></div>
+                        <div class="fd-node"></div>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="ai">
+                    <div class="feature-glow"></div>
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Disruption Prediction</h3>
+                    <p>Machine learning models analyze weather APIs, historical data, and real-time signals to predict disruptions.</p>
+                    <div class="feature-diagram">
+                        <div class="fd-node"></div><div class="fd-line"></div>
+                        <div class="fd-node active"></div><div class="fd-line"></div>
+                        <div class="fd-node"></div>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="claim">
+                    <div class="feature-glow"></div>
+                    <div class="feature-icon">⚡</div>
+                    <h3>Automated Claim Processing</h3>
+                    <p>When disruption signals exceed the threshold, claims are automatically validated and credited to worker wallets.</p>
+                    <div class="feature-diagram">
+                        <div class="fd-node"></div><div class="fd-line"></div>
+                        <div class="fd-node active"></div><div class="fd-line"></div>
+                        <div class="fd-node"></div>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="fraud">
+                    <div class="feature-glow"></div>
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Fraud Detection System</h3>
+                    <p>Cross-references worker locations, timestamps, and report patterns to flag suspicious claims.</p>
+                    <div class="feature-diagram">
+                        <div class="fd-node"></div><div class="fd-line"></div>
+                        <div class="fd-node active"></div><div class="fd-line"></div>
+                        <div class="fd-node"></div>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="wallet">
+                    <div class="feature-glow"></div>
+                    <div class="feature-icon">💳</div>
+                    <h3>Wallet Payout Engine</h3>
+                    <p>Integrates with digital wallets and UPI for instant automated payouts upon claim approval.</p>
+                    <div class="feature-diagram">
+                        <div class="fd-node"></div><div class="fd-line"></div>
+                        <div class="fd-node active"></div><div class="fd-line"></div>
+                        <div class="fd-node"></div>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="ops">
+                    <div class="feature-glow"></div>
+                    <div class="feature-icon">📈</div>
+                    <h3>Operations Dashboard</h3>
+                    <p>Real-time monitoring of zones, claims, payouts, and system performance for the operations team.</p>
+                    <div class="feature-diagram">
+                        <div class="fd-node"></div><div class="fd-line"></div>
+                        <div class="fd-node active"></div><div class="fd-line"></div>
+                        <div class="fd-node"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 5: SIMULATION ENGINE DEMO ========== -->
+    <section id="simulation" class="section sim-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Live Demo</span>
+                <h2 class="section-title">Simulation Engine</h2>
+                <p class="section-desc">Run the GigGuard pipeline in real-time</p>
+            </div>
+            <div class="sim-dashboard">
+                <!-- Control Panel -->
+                <div class="sim-controls glass-panel">
+                    <h3>Control Panel</h3>
+                    <div class="control-group">
+                        <label>Generate Workers</label>
+                        <div class="btn-group">
+                            <button class="sim-btn" onclick="simWorkers(100)">100</button>
+                            <button class="sim-btn active" onclick="simWorkers(500)">500</button>
+                            <button class="sim-btn" onclick="simWorkers(1000)">1000</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Simulate Events</label>
+                        <div class="event-buttons">
+                            <button class="sim-event-btn" id="simRain" onclick="simEvent('rain')">🌧️ Start Rain</button>
+                            <button class="sim-event-btn" id="simReports" onclick="simEvent('reports')">📝 Generate Reports</button>
+                            <button class="sim-event-btn" id="simRisk" onclick="simEvent('risk')">🧠 Trigger Risk Engine</button>
+                        </div>
+                    </div>
+                    <div class="sim-log" id="simLog">
+                        <div class="log-entry">> System initialized...</div>
+                    </div>
+                </div>
+                <!-- Metrics Panel -->
+                <div class="sim-metrics">
+                    <div class="metric-card glass-panel">
+                        <div class="metric-icon">👷</div>
+                        <div class="metric-value" id="metricWorkers">500</div>
+                        <div class="metric-label">Active Workers</div>
+                        <div class="metric-bar"><div class="metric-fill" id="fillWorkers" style="width:50%"></div></div>
+                    </div>
+                    <div class="metric-card glass-panel">
+                        <div class="metric-icon">📋</div>
+                        <div class="metric-value" id="metricClaims">0</div>
+                        <div class="metric-label">Claims Processed</div>
+                        <div class="metric-bar"><div class="metric-fill cyan" id="fillClaims" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-card glass-panel">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-value" id="metricPayouts">₹0</div>
+                        <div class="metric-label">Wallet Payouts</div>
+                        <div class="metric-bar"><div class="metric-fill green" id="fillPayouts" style="width:0%"></div></div>
+                    </div>
+                    <div class="metric-card glass-panel">
+                        <div class="metric-icon">🔴</div>
+                        <div class="metric-value" id="metricZones">0</div>
+                        <div class="metric-label">Zones Affected</div>
+                        <div class="metric-bar"><div class="metric-fill red" id="fillZones" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 6: SYSTEM SCALABILITY ========== -->
+    <section id="scalability" class="section scale-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Performance</span>
+                <h2 class="section-title">Built to Scale</h2>
+                <p class="section-desc">Built to scale across thousands of gig workers with geospatial clustering and AI risk analysis.</p>
+            </div>
+            <div class="scale-visual">
+                <canvas id="scaleCanvas"></canvas>
+                <div class="scale-counter">
+                    <span class="scale-num" id="scaleNum">0</span>
+                    <span class="scale-label">concurrent workers processed</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 7: TECHNOLOGY STACK ========== -->
+    <section id="tech-stack" class="section stack-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Engineering</span>
+                <h2 class="section-title">Technology Stack</h2>
+                <p class="section-desc">Modern, scalable tools powering the GigGuard platform</p>
+            </div>
+            <div class="stack-grid">
+                <div class="stack-badge"><span class="sb-icon">🟧</span> HTML</div>
+                <div class="stack-badge"><span class="sb-icon">🟦</span> CSS</div>
+                <div class="stack-badge"><span class="sb-icon">🟨</span> JavaScript</div>
+                <div class="stack-badge"><span class="sb-icon">🟩</span> Node.js</div>
+                <div class="stack-badge"><span class="sb-icon">⚙️</span> Express</div>
+                <div class="stack-badge"><span class="sb-icon">🐍</span> Python</div>
+                <div class="stack-badge"><span class="sb-icon">🔥</span> Firebase</div>
+                <div class="stack-badge"><span class="sb-icon">🔌</span> WebSockets</div>
+                <div class="stack-badge"><span class="sb-icon">🗺️</span> Leaflet Maps</div>
+                <div class="stack-badge"><span class="sb-icon">🧠</span> AI Risk Engine</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 8: FOOTER ========== -->
+    <footer id="footer" class="footer-section">
+        <canvas id="footerCanvas" class="footer-canvas"></canvas>
+        <div class="container footer-content">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <h3>GigGuard</h3>
+                    <p>Protecting gig workers with intelligent insurance.</p>
+                </div>
+                <div class="footer-links-group">
+                    <a href="#architecture">Architecture</a>
+                    <a href="#simulation">Simulation</a>
+                    <a href="#">Documentation</a>
+                    <a href="https://github.com" target="_blank">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 GigGuard. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- App Modules -->
+    <script src="js/hero3d.js"></script>
+    <script src="js/riskmap.js"></script>
+    <script src="js/simulation.js"></script>
+    <script src="js/animation.js"></script>
+</body>
+</html>

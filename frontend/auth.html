@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigGuard - Authentication</title>
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-glow top-left"></div>
+    <div class="background-glow bottom-right"></div>
+
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="logo">Gig<span>Guard</span></div>
+            
+            <div class="tabs">
+                <div class="tab-indicator"></div>
+                <button id="loginTab" class="tab active" type="button" onclick="switchTheme('login')">Login</button>
+                <button id="signupTab" class="tab" type="button" onclick="switchTheme('signup')">Sign Up</button>
+            </div>
+
+            <!-- LOGIN -->
+            <form id="loginForm" class="auth-form active">
+                <h2 class="form-title">Login</h2>
+                
+                <div class="input-group">
+                    <input type="text" id="loginEmail" placeholder="Email or Phone">
+                </div>
+                
+                <div class="input-group password-group">
+                    <input type="password" id="loginPassword" placeholder="Password">
+                    <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)">
+                        <svg viewBox="0 0 24 24" fill="none" class="eye-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <button type="submit" class="primary-btn" id="loginBtn">
+                    <span class="btn-text">Login</span>
+                    <span class="btn-loader"></span>
+                </button>
+
+                <p class="switch-text">
+                    Don't have an account? <span onclick="switchTheme('signup')">Switch to Sign Up</span>
+                </p>
+            </form>
+
+            <!-- SIGN UP -->
+            <form id="signupForm" class="auth-form">
+                <h2 class="form-title">Join GigGuard</h2>
+                
+                <div class="input-group">
+                    <input type="text" id="name" placeholder="Full Name">
+                </div>
+                
+                <div class="input-group">
+                    <input type="tel" id="phone" placeholder="Phone Number">
+                </div>
+
+                <div class="input-group">
+                    <select id="platform">
+                        <option value="" disabled selected>Delivery Platform</option>
+                        <option value="Zomato">Zomato</option>
+                        <option value="Swiggy">Swiggy</option>
+                        <option value="Blinkit">Blinkit</option>
+                        <option value="Zepto">Zepto</option>
+                        <option value="Uber Eats">Uber Eats</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="zone" placeholder="Work Zone (e.g. Bhubaneswar - Patia)">
+                </div>
+
+                <div class="input-group">
+                    <input type="number" id="income" placeholder="Average Daily Income (₹)">
+                </div>
+                
+                <div class="input-group password-group">
+                    <input type="password" id="signupPassword" placeholder="Password">
+                    <button type="button" class="toggle-password" onclick="togglePassword('signupPassword', this)">
+                        <svg viewBox="0 0 24 24" fill="none" class="eye-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <button type="submit" class="primary-btn" id="signupBtn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loader"></span>
+                </button>
+
+                <p class="switch-text">
+                    Already have an account? <span onclick="switchTheme('login')">Switch to Login</span>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification System -->
+    <div id="toast-container"></div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

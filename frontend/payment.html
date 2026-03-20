@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - ClaimSwift</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f17;
+            --card-bg: rgba(20, 26, 38, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-cyan: #00f0ff;
+            --accent-blue: #3b82f6;
+            --success: #10b981;
+            --grad-accent: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .payment-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .payment-container h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-container p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .summary-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-top: 1rem;
+            border-top: 1px solid var(--card-border);
+            font-weight: 600;
+        }
+        
+        .value {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .btn {
+            background: var(--grad-accent);
+            color: #0b0f17;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.05);
+            box-shadow: none;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.3);
+            border-radius: 50%;
+            border-top-color: #0b0f17;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="payment-container">
+        <h1>Complete Payment</h1>
+        <p>Activate your policy to stay protected</p>
+
+        <div class="summary-card">
+            <div class="detail-row">
+                <span>Platform</span>
+                <span class="value" id="disp-platform">Blinkit</span>
+            </div>
+            <div class="detail-row">
+                <span>Work Zone</span>
+                <span class="value" id="disp-zone">Patia</span>
+            </div>
+            <div class="detail-row">
+                <span>Max Coverage</span>
+                <span class="value" id="disp-coverage">₹400 / day</span>
+            </div>
+            <div class="detail-row" style="color: var(--accent-cyan); font-size: 1.2rem;">
+                <span>Total Premium</span>
+                <span id="disp-premium">₹30</span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="processPayment('UPI')">
+            <span class="btn-text">Pay via UPI</span>
+            <div class="loader"></div>
+        </button>
+        <button class="btn btn-outline" onclick="processPayment('Wallet')">
+            <span class="btn-text">Pay via Wallet</span>
+            <div class="loader" style="border-top-color: #fff;"></div>
+        </button>
+    </div>
+
+    <div class="toast" id="toast">Payment Successful! Redirecting...</div>
+
+    <script>
+        // Load data from localStorage (saved from buy-policy page)
+        document.addEventListener('DOMContentLoaded', () => {
+            const pendingPolicy = JSON.parse(localStorage.getItem('pendingPolicy'));
+            if(pendingPolicy) {
+                document.getElementById('disp-platform').textContent = pendingPolicy.platform;
+                document.getElementById('disp-zone').textContent = pendingPolicy.zone;
+                document.getElementById('disp-coverage').textContent = `₹${pendingPolicy.coverage} / day`;
+                document.getElementById('disp-premium').textContent = `₹${pendingPolicy.premium}`;
+            }
+        });
+
+        function processPayment(method) {
+            const btns = document.querySelectorAll('.btn');
+            btns.forEach(b => b.disabled = true);
+            
+            // Show loader on the clicked button
+            const targetBtn = event.currentTarget;
+            targetBtn.querySelector('.btn-text').style.display = 'none';
+            targetBtn.querySelector('.loader').style.display = 'block';
+
+            // Simulate API call to backend /activate-policy
+            setTimeout(async () => {
+                const pendingPolicy = JSON.parse(localStorage.getItem('pendingPolicy')) || {};
+                
+                try {
+                    const res = await fetch('http://localhost:5000/api/policy/activate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            userId: "mock-user-123", // In a real app, from auth token
+                            ...pendingPolicy,
+                            paymentMethod: method
+                        })
+                    });
+                    
+                    // Whether backend is ready or not, simulate success for demo
+                    const toast = document.getElementById('toast');
+                    toast.classList.add('show');
+                    
+                    // Clear pending policy and set as active in local storage for frontend mockup
+                    localStorage.removeItem('pendingPolicy');
+                    localStorage.setItem('hasActivePolicy', 'true');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+
+                } catch(error) {
+                    console.log('Backend not ready yet, using mock success');
+                    const toast = document.getElementById('toast');
+                    toast.classList.add('show');
+                    
+                    localStorage.removeItem('pendingPolicy');
+                    localStorage.setItem('hasActivePolicy', 'true');
+
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                }
+
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

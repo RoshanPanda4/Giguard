@@ -1,0 +1,395 @@
+/* GigGuard CSS - Dark Fintech Theme */
+
+:root {
+    --bg-dark: #000a14;
+    --navy-panel: rgba(10, 20, 35, 0.6);
+    --border-cyan: rgba(0, 242, 255, 0.25);
+    --neon-cyan: #00f2ff;
+    --neon-cyan-glow: rgba(0, 242, 255, 0.4);
+    --green-accent: #00ff88;
+    --error-red: #ff4757;
+    --text-main: #ffffff;
+    --text-muted: #8b9bb4;
+    --font-inter: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-inter);
+}
+
+body {
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-main);
+    overflow-x: hidden;
+    position: relative;
+    padding: 20px;
+}
+
+/* Subtle background gradient glow */
+.background-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+    opacity: 0.45;
+    pointer-events: none;
+    animation: pulse 8s infinite alternate ease-in-out;
+}
+
+.background-glow.top-left {
+    background: radial-gradient(circle, var(--neon-cyan-glow), transparent 60%);
+    top: -150px;
+    left: -200px;
+}
+
+.background-glow.bottom-right {
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.15), transparent 60%);
+    bottom: -150px;
+    right: -200px;
+    animation-direction: alternate-reverse;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.3; }
+    100% { transform: scale(1.1); opacity: 0.5; }
+}
+
+/* Container & Glassmorphism Panel */
+.auth-wrapper {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 10;
+}
+
+.auth-card {
+    background: var(--navy-panel);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-cyan);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 242, 255, 0.05);
+    animation: fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header & Logo */
+.logo {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 30px;
+    color: var(--text-main);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.logo span {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 15px var(--neon-cyan-glow);
+}
+
+/* Tabs UI */
+.tabs {
+    display: flex;
+    position: relative;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    padding: 6px;
+    margin-bottom: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.tab.active {
+    color: var(--bg-dark);
+}
+
+.tab-indicator {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
+    width: calc(50% - 6px);
+    background: var(--neon-cyan);
+    border-radius: 8px;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1;
+    box-shadow: 0 0 15px var(--neon-cyan-glow);
+}
+
+/* Forms */
+.auth-form {
+    display: none;
+    opacity: 0;
+}
+
+.auth-form.active {
+    display: block;
+    animation: fadeIn 0.4s ease 0.1s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    text-align: center;
+    color: var(--text-main);
+}
+
+/* Inputs */
+.input-group {
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.input-group input, 
+.input-group select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+    appearance: none;
+}
+
+.input-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b9bb4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+}
+
+.input-group select option {
+    background: var(--bg-dark);
+    color: var(--text-main);
+}
+
+.input-group input::placeholder,
+.input-group select:invalid {
+    color: var(--text-muted);
+}
+
+.input-group input:focus, 
+.input-group select:focus {
+    background: rgba(0, 242, 255, 0.03);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 0 1px var(--neon-cyan), 0 0 15px rgba(0, 242, 255, 0.15) inset;
+}
+
+/* Password Toggle */
+.password-group .toggle-password {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+    padding: 0;
+}
+
+.password-group .toggle-password:hover {
+    color: var(--neon-cyan);
+}
+
+.eye-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* Primary Button */
+.primary-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    background: var(--neon-cyan);
+    color: var(--bg-dark);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 52px;
+}
+
+.primary-btn:hover {
+    background: #1affff;
+    box-shadow: 0 0 25px rgba(0, 242, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+/* Animated Button Loading State */
+.primary-btn.loading {
+    background: rgba(0, 242, 255, 0.8);
+    color: transparent;
+    pointer-events: none;
+    box-shadow: none;
+}
+
+.btn-loader {
+    display: none;
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(0, 10, 20, 0.2);
+    border-top-color: var(--bg-dark);
+    border-radius: 50%;
+    animation: spinner 0.8s linear infinite;
+}
+
+.primary-btn.loading .btn-loader {
+    display: block;
+}
+
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+/* Switch Text */
+.switch-text {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.switch-text span {
+    color: var(--neon-cyan);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.switch-text span:hover {
+    color: #ffffff;
+    text-shadow: 0 0 10px var(--neon-cyan-glow);
+}
+
+/* Toast Notification System */
+#toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    background: rgba(5, 15, 25, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-cyan);
+    color: var(--text-main);
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.success {
+    border-color: var(--green-accent);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.toast.success .toast-icon {
+    color: var(--green-accent);
+}
+
+.toast.error {
+    border-color: var(--error-red);
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.1);
+}
+
+.toast.error .toast-icon {
+    color: var(--error-red);
+}
+
+.toast-message {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 32px 20px;
+        border-radius: 20px;
+    }
+    
+    #toast-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+    }
+    
+    .toast {
+        min-width: unset;
+        width: 100%;
+    }
+}

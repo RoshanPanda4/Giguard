@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard - ClaimSwift</title>
+    <!-- Use Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS resets and variables */
+        :root {
+            --bg-color: #0b0f17;
+            --card-bg: rgba(20, 26, 38, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-cyan: #00f0ff;
+            --accent-blue: #3b82f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --grad-accent: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient glowing background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* -----------------------
+           SECTION 1: NAVBAR
+        ------------------------ */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(11, 15, 23, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--grad-accent);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-cyan);
+        }
+
+        .nav-links .logout {
+            padding: 0.5rem 1.2rem;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+        .nav-links .logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Mobile menu toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background-color: var(--text-main);
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-color);
+                padding: 1rem 0;
+                border-bottom: 1px solid var(--card-border);
+                align-items: flex-start;
+                padding-left: 5%;
+                gap: 1.5rem;
+            }
+            .nav-links.show {
+                display: flex;
+            }
+            .menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Main Container */
+        main {
+            padding: 2.5rem 5%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* -----------------------
+           USER PROFILE SECTION
+        ------------------------ */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-photo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .user-info .greeting {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--text-main);
+        }
+
+        .user-info .sub-greeting {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* -----------------------
+           SECTION 2: SUMMARY CARDS
+        ------------------------ */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+        }
+
+        .summary-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card .value {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background: var(--grad-accent);
+            color: #0b0f17;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: opacity 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+            width: max-content;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        /* -----------------------
+           SECTION 3, 4, 5 LAYOUT
+        ------------------------ */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Policy Details */
+        .policy-details h2, .history-section h2, .zone-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .policy-details p.message {
+            color: var(--text-main);
+            font-size: 1.05rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .policy-details .supporting-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            line-height: 1.6;
+            max-width: 80%;
+        }
+
+        /* History Table/List */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .history-info .event-name {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+        }
+
+        .history-info .event-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .history-amount {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--success);
+        }
+        .history-amount.debit {
+            color: var(--text-muted);
+        }
+
+        /* Zone Status */
+        .zone-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .zone-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .zone-info:last-of-type {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .zone-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .zone-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .risk-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            width: fit-content;
+        }
+        
+        .risk-indicator.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .risk-indicator.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .risk-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .zone-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(11, 15, 23, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--accent-cyan);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 240, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 240, 255, 0.1);
+            border-radius: 50%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. Navigation Bar -->
+    <nav>
+        <a href="dashboard.html" class="logo">ClaimSwift</a>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="buy-policy.html">Buy Policy</a>
+            <a href="#" class="logout" onclick="logout(event)">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- User Greeting Section -->
+        <section class="user-profile">
+            <!-- Round photo for identification -->
+            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Profile Photo" class="user-photo">
+            <div class="user-info">
+                <h1 class="greeting" id="userGreeting">Hello! 👋</h1>
+                <p class="sub-greeting" id="userSubGreeting">Welcome back to your dashboard. Stay safe out there.</p>
+            </div>
+        </section>
+
+        <!-- 2. Summary Cards -->
+        <section class="summary-grid">
+            <!-- Card 1 -->
+            <div class="glass-card summary-card">
+                <div>
+                    <h3>Policy Status</h3>
+                    <div class="value" id="policyStatus" style="color: var(--text-muted)">Loading...</div>
+                </div>
+                <a href="buy-policy.html" class="btn" id="buyPolicyBtn" style="width: 100%;">Buy Policy</a>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-card summary-card">
+                <div>
+                    <h3>Coverage Amount</h3>
+                    <div class="value" id="policyCoverage" style="color: var(--text-muted)">--</div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-card summary-card">
+                <div>
+                    <h3>Weekly Premium</h3>
+                    <div class="value" id="policyPremium" style="color: var(--text-muted)">--</div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="glass-card summary-card">
+                <div>
+                    <h3>Wallet Balance</h3>
+                    <div class="value" id="walletBalance">₹0</div>
+                </div>
+                <button class="btn btn-outline" style="width: 100%;" onclick="withdrawFunds()">Withdraw</button>
+            </div>
+        </section>
+
+        <!-- Dynamic Grid Layout -->
+        <section class="dashboard-content">
+            
+            <!-- Left Column -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- 3. Policy Details Panel -->
+                <div class="glass-card policy-details" id="policyDetailsPanel">
+                    <h2>Insurance Policy Details</h2>
+                    <p class="message" id="policyMessage">Loading your policy details...</p>
+                    <a href="buy-policy.html" class="btn" id="panelBuyBtn">Buy Policy</a>
+                    <p class="supporting-text">Activate a dynamic parametric insurance policy to protect your income during disruptions.</p>
+                </div>
+
+                <!-- 4. Wallet & Claim History -->
+                <div class="glass-card history-section">
+                    <h2>Wallet & Claim History</h2>
+                    <div class="history-list" id="historyList">
+                        <!-- Dynamically populated from backend -->
+                        <div style="color: var(--text-muted); font-size: 0.9rem;">No recent history.</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- 5. Zone Risk Status -->
+                <div class="glass-card zone-card">
+                    <h2 class="zone-section">Zone Risk Status</h2>
+                    
+                    <div class="zone-info">
+                        <span class="zone-label">Zone</span>
+                        <span class="zone-value">Patia</span>
+                    </div>
+
+                    <div class="zone-info">
+                        <span class="zone-label">Current Risk Level</span>
+                        <div class="risk-indicator" id="riskBadge">LOW</div>
+                    </div>
+
+                    <p class="zone-desc">This status reflects real-time environmental risk signals monitored by the system.</p>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script>
+        // Check Authentication
+        if (localStorage.getItem("isAuthenticated") !== "true") {
+            window.location.href = "auth.html";
+        }
+
+        // Logout function
+        function logout(e) {
+            if (e) e.preventDefault();
+            localStorage.removeItem("isAuthenticated");
+            window.location.href = "auth.html";
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('show');
+        }
+
+        // Fetch Real Data from Backend
+        document.addEventListener("DOMContentLoaded", async () => {
+            const userId = localStorage.getItem("userId") || "mock-user-123"; // For demo
+            
+            // 0. Update Profile Name
+            const userName = localStorage.getItem("userName");
+            if(userName) {
+                document.getElementById("userGreeting").innerText = `Hello, ${userName}! 👋`;
+            }
+
+            // 1. Fetch Wallet and History
+            try {
+                const walletRes = await fetch(`http://localhost:5000/api/wallet/${userId}`);
+                const walletData = await walletRes.json();
+                if(walletRes.ok) {
+                    document.getElementById('walletBalance').innerText = `₹${walletData.balance || 0}`;
+                    
+                    if(walletData.history && walletData.history.length > 0) {
+                        const historyList = document.getElementById('historyList');
+                        historyList.innerHTML = '';
+                        walletData.history.forEach(item => {
+                            const d = new Date(item.date._seconds ? item.date._seconds * 1000 : item.date);
+                            const tStr = `${d.toLocaleString('default', { month: 'short' })} ${d.getDate()}, ${d.getFullYear()} • ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                            const isCredit = item.amount > 0;
+                            const amtCls = isCredit ? '' : 'debit';
+                            const amtSign = isCredit ? '+' : '-';
+                            
+                            historyList.innerHTML += `
+                                <div class="history-item">
+                                    <div class="history-info">
+                                        <div class="event-name">${item.reason || (isCredit ? 'Claim Payout' : 'Bank Withdrawal')}</div>
+                                        <div class="event-date">${tStr}</div>
+                                    </div>
+                                    <div class="history-amount ${amtCls}">${amtSign} ₹${Math.abs(item.amount)}</div>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+            } catch(e) {
+                console.error("Wallet fetch failed:", e);
+                document.getElementById('walletBalance').innerText = localStorage.getItem('hasActivePolicy') ? '₹430' : '₹0';
+            }
+
+            // 2. Fetch Policy Details (unchanged)
+            try {
+                const policyRes = await fetch(`https://safegig-pink.vercel.app/api/policy/${userId}`);
+                const policyData = await policyRes.json();
+                
+                const pStatus = document.getElementById('policyStatus');
+                const pCov = document.getElementById('policyCoverage');
+                const pPrem = document.getElementById('policyPremium');
+                const pMsg = document.getElementById('policyMessage');
+                const btn1 = document.getElementById('buyPolicyBtn');
+                const btn2 = document.getElementById('panelBuyBtn');
+
+                // Using localStorage as fallback if mock success on payment
+                const hasLocalPolicy = localStorage.getItem('hasActivePolicy') === 'true';
+
+                if(policyRes.ok && policyData.success) {
+                    const p = policyData.policy;
+                    pStatus.innerText = 'ACTIVE';
+                    pStatus.style.color = 'var(--success)';
+                    pCov.innerText = `₹${p.coverage} / day`;
+                    pCov.style.color = 'var(--text-main)';
+                    pPrem.innerText = `₹${p.premium} / week`;
+                    pPrem.style.color = 'var(--text-main)';
+                    pMsg.innerText = `You are protected for deliveries in ${p.zone} on ${p.platform}.`;
+                    
+                    if(btn1) btn1.style.display = 'none';
+                    if(btn2) btn2.style.display = 'none';
+                } else if (hasLocalPolicy) {
+                    pStatus.innerText = 'ACTIVE (Demo)';
+                    pStatus.style.color = 'var(--success)';
+                    pCov.innerText = `₹400 / day`;
+                    pCov.style.color = 'var(--text-main)';
+                    pPrem.innerText = `₹30 / week`;
+                    pPrem.style.color = 'var(--text-main)';
+                    pMsg.innerText = `You are protected for active deliveries.`;
+                    
+                    if(btn1) btn1.style.display = 'none';
+                    if(btn2) btn2.style.display = 'none';
+                } else {
+                    pStatus.innerText = 'No Active Policy';
+                    pCov.innerText = 'Not Activated';
+                    pPrem.innerText = 'Not Set';
+                    pMsg.innerText = 'You do not currently have an active insurance policy.';
+                }
+
+            } catch(e) {
+                console.error("Policy fetch failed:", e);
+                // Same fallback block
+                const pStatus = document.getElementById('policyStatus');
+                const hasLocalPolicy = localStorage.getItem('hasActivePolicy') === 'true';
+                if (hasLocalPolicy) {
+                    pStatus.innerText = 'ACTIVE (Offline Mock)';
+                    pStatus.style.color = 'var(--success)';
+                    document.getElementById('policyCoverage').innerText = `₹400 / day`;
+                    document.getElementById('policyPremium').innerText = `₹30 / week`;
+                    document.getElementById('buyPolicyBtn').style.display = 'none';
+                    document.getElementById('panelBuyBtn').style.display = 'none';
+                    document.getElementById('policyMessage').innerText = 'You are protected for active deliveries.';
+                } else {
+                    pStatus.innerText = 'No Active Policy';
+                    document.getElementById('policyMessage').innerText = 'You do not currently have an active insurance policy.';
+                }
+            }
+        });
+
+        // Toast Notification System
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">✓</div>
+                <span class="toast-message">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger reflow to apply transition
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Remove toast after interval
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 400); // Wait for CSS transition
+            }, 3000);
+        }
+
+        // Withdraw action
+        function withdrawFunds() {
+            const balanceEl = document.getElementById('walletBalance');
+            const currentBalanceText = balanceEl.innerText;
+            const currentBalance = parseInt(currentBalanceText.replace('₹', ''));
+            
+            if (currentBalance > 0) {
+                // Simulate processing delay
+                balanceEl.style.opacity = '0.5';
+                showToast(`Processing withdrawal of ${currentBalanceText}...`);
+                
+                setTimeout(() => {
+                    balanceEl.innerText = '₹0';
+                    balanceEl.style.opacity = '1';
+                    showToast('Withdrawal successful! Funds sent to your bank.');
+                    
+                    // Add withdrawal to history
+                    const historyList = document.getElementById('historyList');
+                    const date = new Date();
+                    const dateString = `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}, ${date.getFullYear()} • ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                    
+                    const newItem = document.createElement('div');
+                    newItem.className = 'history-item';
+                    newItem.innerHTML = `
+                        <div class="history-info">
+                            <div class="event-name">Bank Withdrawal</div>
+                            <div class="event-date">${dateString}</div>
+                        </div>
+                        <div class="history-amount debit">- ₹${currentBalance}</div>
+                    `;
+                    
+                    // Insert at beginning
+                    historyList.insertBefore(newItem, historyList.firstChild);
+                    
+                }, 1500);
+            } else {
+                showToast('Insufficient funds to withdraw.');
+            }
+        }
+    </script>
+</body>
+</html>
