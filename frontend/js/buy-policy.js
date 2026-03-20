@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         generateBtn.disabled = true;
 
         try {
-            const res = await fetch('https://safegig-pink.vercel.app/api/policy/generate', {
+            const res = await fetch('https://giguard.onrender.com/api/policy/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ platform, zone, dailyIncome, workHours })

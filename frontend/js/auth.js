@@ -112,7 +112,7 @@ signupForm.addEventListener('submit', async (e) => {
     // Network Request to Backend API
     try {
         const payload = { name, phone, platform, zone, income, password };
-        const response = await fetch('https://safegig-pink.vercel.app/api/auth/signup', {
+        const response = await fetch('https://giguard.onrender.com/api/auth/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

@@ -651,7 +651,7 @@
 
             // 1. Fetch Wallet and History
             try {
-                const walletRes = await fetch(`http://localhost:5000/api/wallet/${userId}`);
+                const walletRes = await fetch(`https://giguard.onrender.com/api/wallet/${userId}`);
                 const walletData = await walletRes.json();
                 if(walletRes.ok) {
                     document.getElementById('walletBalance').innerText = `₹${walletData.balance || 0}`;
@@ -685,7 +685,7 @@
 
             // 2. Fetch Policy Details (unchanged)
             try {
-                const policyRes = await fetch(`https://safegig-pink.vercel.app/api/policy/${userId}`);
+                const policyRes = await fetch(`https://giguard.onrender.com/api/policy/${userId}`);
                 const policyData = await policyRes.json();
                 
                 const pStatus = document.getElementById('policyStatus');
