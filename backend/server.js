@@ -1,3 +1,7 @@
+
+require('dotenv').config();
+
+
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -5,7 +9,6 @@ const { exec } = require('child_process');
 const path = require('path');
 const { db } = require('./config/firebase');
 
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
