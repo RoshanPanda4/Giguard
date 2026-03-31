@@ -17,6 +17,7 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
+console.log(typeof authRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/policy', policyRoutes);
 app.use('/api/wallet', walletRoutes);
