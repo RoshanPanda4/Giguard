@@ -5,7 +5,8 @@ const path = require('path');
 const authRoutes = require('./routes/auth.routes');
 const policyRoutes = require('./routes/policy.routes');
 const walletRoutes = require('./routes/wallet.routes');
-const userRoutes = require('./routes/user.routes'); // ✅ ADD THIS
+const userRoutes = require('./routes/user.routes');
+const simulationRoutes = require('./routes/simulation.routes'); // ✅ ADD THIS
 
 const app = express();
 
@@ -18,10 +19,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/policy', policyRoutes);
 app.use('/api/wallet', walletRoutes);
-app.use('/api/user', userRoutes); // ✅ ADD THIS
+app.use('/api/user', userRoutes);
+app.use('/api/simulation', simulationRoutes); // ✅ ADD THIS
 
 // ======================
-// SERVE USER PHOTOS 🔥
+// SERVE USER PHOTOS
 // ======================
 app.use('/usrphotos', express.static(path.join(__dirname, 'usrphotos')));
 
