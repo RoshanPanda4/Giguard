@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-router.post('/run', (req, res) => {
-    res.json({
-        success: true,
-        message: "Simulation route working"
-    });
-});
+// Import controller
+const { runSimulation } = require('../controllers/simulation.controller');
+
+// 🔥 MAIN ROUTE (FINAL)
+router.post('/', runSimulation);
 
 module.exports = router;
