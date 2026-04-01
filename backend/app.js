@@ -5,7 +5,7 @@ const path = require('path');
 const authRoutes = require('./routes/auth.routes');
 const policyRoutes = require('./routes/policy.routes');
 const walletRoutes = require('./routes/wallet.routes');
-// const simulationRoutes = require('./routes/simulation.routes'); // add later if exists
+const userRoutes = require('./routes/user.routes'); // ✅ ADD THIS
 
 const app = express();
 
@@ -13,29 +13,32 @@ app.use(cors());
 app.use(express.json());
 
 // ======================
-// API ROUTES FIRST
+// API ROUTES
 // ======================
 app.use('/api/auth', authRoutes);
 app.use('/api/policy', policyRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/user', userRoutes); // ✅ ADD THIS
 
+// ======================
+// SERVE USER PHOTOS 🔥
+// ======================
+app.use('/usrphotos', express.static(path.join(__dirname, 'usrphotos')));
 
 // ======================
 // SERVE FRONTEND
 // ======================
-
-// IMPORTANT: adjust path if needed
 const frontendPath = path.join(__dirname, '../frontend');
 
 app.use(express.static(frontendPath));
 
-// Default route → index.html
+// Default route
 app.get('/', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // ======================
-// FALLBACK (SPA support)
+// FALLBACK (SPA)
 // ======================
 app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));

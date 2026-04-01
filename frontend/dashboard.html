@@ -520,15 +520,26 @@
 
     <!-- Main Content -->
     <main>
-        <!-- User Greeting Section -->
-        <section class="user-profile">
-            <!-- Round photo for identification -->
-            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Profile Photo" class="user-photo">
-            <div class="user-info">
-                <h1 class="greeting" id="userGreeting">Hello! 👋</h1>
-                <p class="sub-greeting" id="userSubGreeting">Welcome back to your dashboard. Stay safe out there.</p>
-            </div>
-        </section>
+       <!-- USER PROFILE -->
+<section class="user-profile">
+    <div style="position: relative;">
+        <img id="profileImage"
+             src="https://via.placeholder.com/150"
+             class="user-photo">
+
+        <button id="uploadBtn"
+            style="position:absolute; bottom:0; right:0; border:none; border-radius:50%; padding:6px; cursor:pointer;">
+            📷
+        </button>
+
+        <input type="file" id="photoInput" hidden />
+    </div>
+
+    <div class="user-info">
+        <h1 class="greeting" id="userGreeting">Hello! 👋</h1>
+        <p class="sub-greeting">Welcome back to your dashboard.</p>
+    </div>
+</section>
 
         <!-- 2. Summary Cards -->
         <section class="summary-grid">
