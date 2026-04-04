@@ -15,7 +15,9 @@ router.post("/upload-photo", verifyToken, upload.single("photo"), (req, res) => 
         return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const url = `/usrphotos/${req.file.filename}`;
+    // Convert buffer to base64 to store directly in DB
+    const base64String = req.file.buffer.toString('base64');
+    const url = `data:${req.file.mimetype};base64,${base64String}`;
 
     res.json({
         message: "Uploaded successfully",

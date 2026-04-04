@@ -11,21 +11,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // ================== STORAGE CONFIG ==================
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        const name = path.basename(file.originalname, ext);
-
-        // Clean filename + unique
-        const safeName = name.replace(/\s+/g, "-").toLowerCase();
-        const uniqueName = `${safeName}-${Date.now()}${ext}`;
-
-        cb(null, uniqueName);
-    }
-});
+const storage = multer.memoryStorage();
 
 // ================== FILE FILTER ==================
 const fileFilter = (req, file, cb) => {
