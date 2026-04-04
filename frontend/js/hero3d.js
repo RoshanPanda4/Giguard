@@ -1,6 +1,6 @@
 /* ====================================================
    hero3d.js — Three.js 3D City Grid Animation
-   Represents the GigGuard delivery network:
+   Represents the Polysure AI delivery network:
    - Grid = City map
    - Moving dots = Gig workers
    - Pulsing clusters = Delivery zones

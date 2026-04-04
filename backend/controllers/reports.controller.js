@@ -36,12 +36,18 @@ exports.getZoneRiskStatus = async (req, res) => {
         const zone = req.params.zone;
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
+        // Fetch all reports for the zone and filter by timestamp in memory
+        // This avoids needing a composite index in Firestore (zone + timestamp)
         const snapshot = await db.collection('reports')
             .where('zone', '==', zone)
-            .where('timestamp', '>=', oneHourAgo)
             .get();
 
-        const reportCount = snapshot.size;
+        const reports = snapshot.docs.filter(doc => {
+            const data = doc.data();
+            return data.timestamp && data.timestamp.toDate() >= oneHourAgo;
+        });
+
+        const reportCount = reports.length;
 
         let status = "LOW";
         if (reportCount >= 6) status = "DANGER";

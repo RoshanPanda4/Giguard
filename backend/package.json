@@ -1,7 +1,7 @@
 {
   "name": "giguard-backend",
   "version": "2.0.0",
-  "description": "Production-ready backend for GigGuard InsurTech platform",
+  "description": "Production-ready backend for Polysure AI InsurTech platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
