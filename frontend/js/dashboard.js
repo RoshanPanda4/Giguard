@@ -13,6 +13,8 @@ function logout(e) {
     window.location.href = "auth.html";
 }
 
+let userProfile = null;
+
 // ================== USER GREETING ==================
 async function loadUser() {
     try {
@@ -22,6 +24,7 @@ async function loadUser() {
         const data = await res.json();
         
         if (data.success && data.profile) {
+            userProfile = data.profile; // Store globally for emergency reporting
             const userName = data.profile.name;
             const photo = data.profile.photo;
 
@@ -228,6 +231,142 @@ function setupPhotoUpload() {
     });
 }
 
+// ================== EMERGENCY REPORTING ==================
+function openEmergencyModal() {
+    document.getElementById("emergencyModal").classList.add("show");
+}
+
+function closeEmergencyModal() {
+    document.getElementById("emergencyModal").classList.remove("show");
+}
+
+async function submitEmergency(type) {
+    if (!userProfile) return alert("User profile not loaded yet.");
+
+    // Close modal immediately
+    closeEmergencyModal();
+    showToast(`Submitting ${type} report...`, 'info');
+
+    try {
+        // 1. Submit the formal report to the backend
+        const reportRes = await fetch(`${API_BASE}/reports`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ 
+                zone: userProfile.zone || 'Patia', 
+                disasterType: type 
+            })
+        });
+
+        if (!reportRes.ok) throw new Error("Report failed");
+
+        // 2. Perform a background AI assessment for the user
+        const aiPayload = {
+            platform: userProfile.platform || 'Blinkit',
+            zone: userProfile.zone || 'Patia',
+            dailyIncome: userProfile.income || 2500,
+            workHours: 8,
+            weather: type.includes('Flood') || type.includes('Cyclone') ? 'rain' : 'normal',
+            reports: 15
+        };
+
+        const response = await fetch(`${API_BASE}/simulation`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify(aiPayload)
+        });
+
+        const aiData = await response.json();
+        
+        // 3. Save result to DB for claims
+        const simResult = {
+            risk: aiData.risk || 0.85, 
+            disasterType: type,
+            timestamp: new Date().toISOString(),
+            claim: aiData.claim || { approved: true, payout: 500 }
+        };
+
+        await fetch(`${API_BASE}/simulation/result`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(simResult)
+        });
+
+        showToast(`${type} reported! Global risk system updated.`, 'success');
+        
+        // 4. Immediately refresh global zone risk
+        loadZoneRiskStatus();
+        setTimeout(loadHistory, 2000);
+
+    } catch (err) {
+        console.error("Emergency report failed:", err);
+        showToast("Failed to report emergency. Please try again.", 'error');
+    }
+}
+
+async function loadZoneRiskStatus() {
+    if (!userProfile || !userProfile.zone) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/reports/status/${userProfile.zone}`);
+        const data = await res.json();
+
+        if (data.success) {
+            const badge = document.getElementById("riskBadge");
+            if (badge) {
+                badge.innerText = data.status;
+                badge.className = `risk-indicator ${data.status.toLowerCase()}`;
+                
+                // If it's DANGER/MEDIUM, highlight it
+                if (data.status === 'DANGER') {
+                    badge.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.4)";
+                } else {
+                    badge.style.boxShadow = "none";
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load zone risk status", err);
+    }
+}
+
+function showToast(message, type) {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast show`;
+    
+    // Simple icon matching
+    let icon = "🔔";
+    if (type === 'success') icon = "✅";
+    if (type === 'error') icon = "❌";
+    if (type === 'info') icon = "ℹ️";
+
+    toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div>${message}</div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(120%)";
+        setTimeout(() => toast.remove(), 500);
+    }, 4000);
+}
+
+
 // ================== MENU ==================
 function toggleMenu() {
     const nav = document.getElementById("navLinks");
@@ -235,10 +374,14 @@ function toggleMenu() {
 }
 
 // ================== INIT ==================
-document.addEventListener("DOMContentLoaded", () => {
-    loadUser();
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadUser(); // wait for userProfile
     loadWallet();
     loadPolicy();
     loadHistory();
     setupPhotoUpload();
+    loadZoneRiskStatus();
+
+    // Periodically fetch global zone risk
+    setInterval(loadZoneRiskStatus, 60000); // Every minute
 });
