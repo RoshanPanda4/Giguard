@@ -60,9 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 reports: 0
             };
 
-            const res = await fetch('https://gigaurdaiengine.onrender.com/predict', {
+            // Pass through our backend proxy to avoid CORS
+            const res = await fetch('https://giguard.onrender.com/api/simulation', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify(aiPayload)
             });
 

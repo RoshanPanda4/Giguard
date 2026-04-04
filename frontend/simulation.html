@@ -723,7 +723,7 @@
         };
 
         // === AI ENGINE CONFIG ===
-        const AI_ENGINE_URL = 'https://gigaurdaiengine.onrender.com/predict';
+        const AI_ENGINE_URL = 'https://giguard.onrender.com/api/simulation';
 
         // Load profile
         window.userProfile = { platform: 'Blinkit', zone: 'Patia', income: 2500 };
@@ -885,10 +885,14 @@
             updateRiskBreakdown(rainFraction, dropFraction, reportFraction, 0);
 
             try {
-                // ====== CALL REAL AI ENGINE ======
+                // ====== CALL REAL AI ENGINE (Via Proxy) ======
+                const tokenCache = localStorage.getItem('token');
                 const response = await fetch(AI_ENGINE_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${tokenCache}` 
+                    },
                     body: JSON.stringify(aiPayload)
                 });
 
@@ -909,9 +913,13 @@
                 // Retry once after delay (Render cold start)
                 setTimeout(async () => {
                     try {
+                        const tokenCache = localStorage.getItem('token');
                         const retryRes = await fetch(AI_ENGINE_URL, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${tokenCache}` 
+                            },
                             body: JSON.stringify(aiPayload)
                         });
                         if (!retryRes.ok) throw new Error('Retry failed');
