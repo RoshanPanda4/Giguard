@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulation - ClaimSwift</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI Simulation — Giggaurd</title>
+    <meta name="description" content="Giggaurd AI-powered parametric insurance simulation dashboard — real-time risk analysis and claim automation">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0b0f17;
@@ -17,6 +18,7 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --success: #10b981;
+            --grad-accent: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -30,13 +32,15 @@
             overflow: hidden;
         }
 
-        /* Navbar */
+        /* ===== NAVBAR ===== */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem 2rem;
-            background: rgba(11, 15, 23, 0.8);
+            background: rgba(11, 15, 23, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--card-border);
             z-index: 100;
         }
@@ -44,68 +48,292 @@
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            background: var(--grad-accent);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-decoration: none;
         }
-        
+
         .nav-links a {
             color: var(--text-muted);
             text-decoration: none;
             margin-left: 2rem;
             font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
         .nav-links a:hover, .nav-links a.active { color: var(--accent-cyan); }
 
-        /* Main Layout */
+        /* ===== MAIN 3-COL LAYOUT ===== */
         main {
             display: grid;
-            grid-template-columns: 350px 1fr 350px;
+            grid-template-columns: 340px 1fr 360px;
             flex-grow: 1;
             height: calc(100vh - 65px);
         }
 
-        /* Glass Panel */
+        /* ===== GLASS PANEL (left + right) ===== */
         .glass-panel {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-right: 1px solid var(--card-border);
             border-left: 1px solid var(--card-border);
-            padding: 2rem;
+            padding: 1.5rem;
             overflow-y: auto;
             position: relative;
             z-index: 10;
         }
 
-        /* Left Controls */
-        h2 { font-size: 1.2rem; margin-bottom: 1.5rem; }
-        .control-group { margin-bottom: 2rem; }
-        .control-group label { display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem; text-transform: uppercase; }
+        .glass-panel::-webkit-scrollbar { width: 4px; }
+        .glass-panel::-webkit-scrollbar-track { background: transparent; }
+        .glass-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
-        .btn {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-main);
-            border: 1px solid var(--card-border);
-            padding: 0.8rem;
-            width: 100%;
+        /* ===== PANEL HEADERS ===== */
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+        .panel-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .panel-header .badge {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== CONTROL GROUPS ===== */
+        .control-group {
+            margin-bottom: 1.8rem;
+        }
+        .control-group label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            margin-bottom: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        /* ===== INTENSITY BUTTONS (Low/Med/High) ===== */
+        .intensity-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .intensity-btn {
+            flex: 1;
+            padding: 0.65rem 0.5rem;
             border-radius: 8px;
-            font-weight: 500;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
             cursor: pointer;
-            margin-bottom: 0.8rem;
-            transition: all 0.2s;
-            text-align: left;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            text-align: center;
+        }
+        .intensity-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+        }
+        .intensity-btn.active {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
+        }
+        .intensity-btn.active.danger {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.1);
+        }
+        .intensity-btn.active.warning {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.1);
+        }
+
+        /* ===== SLIDER ===== */
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .slider-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .btn:hover { background: rgba(255,255,255,0.1); }
-        .btn.active { border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); }
-        .btn.triggered { border-color: var(--danger); background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .btn.risk-btn { background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(59, 130, 246, 0.2)); border-color: var(--accent-cyan); text-align: center; justify-content: center; font-weight: 700; margin-top: 2rem;}
-        
-        /* Map Container (Center) */
+        .slider-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            outline: none;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+            cursor: pointer;
+            border: none;
+        }
+
+        /* ===== SURGE TOGGLE ===== */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .toggle-row.active {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.06);
+        }
+        .toggle-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+        }
+        .toggle-switch input { display: none; }
+        .toggle-track {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: background 0.3s ease;
+        }
+        .toggle-switch input:checked + .toggle-track {
+            background: rgba(239, 68, 68, 0.5);
+        }
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--text-main);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .toggle-switch input:checked ~ .toggle-thumb {
+            transform: translateX(20px);
+            background: var(--danger);
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+        }
+
+        /* ===== RUN ENGINE BUTTON ===== */
+        .run-btn {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(59, 130, 246, 0.15));
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .run-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(59, 130, 246, 0.25));
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        .run-btn.running {
+            pointer-events: none;
+            animation: pulse-glow 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(0, 240, 255, 0.3); }
+        }
+
+        /* ===== VIEW CLAIM BUTTON ===== */
+        .claim-btn {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 10px;
+            border: none;
+            background: var(--grad-accent);
+            color: #0b0f17;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+        }
+        .claim-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+        }
+        .claim-btn.show { display: flex; }
+
+        /* ===== MAP CONTAINER ===== */
         .map-container {
             position: relative;
             width: 100%;
@@ -119,55 +347,202 @@
         }
         .map-status-overlay {
             position: absolute;
-            top: 2rem;
+            top: 1.5rem;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(11, 15, 23, 0.9);
+            background: rgba(11, 15, 23, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--card-border);
-            padding: 0.8rem 1.5rem;
+            padding: 0.7rem 1.5rem;
             border-radius: 30px;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            font-size: 0.9rem;
+            gap: 0.7rem;
+            font-size: 0.85rem;
             z-index: 20;
+            font-weight: 500;
         }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .status-dot.green { background: var(--success); box-shadow: 0 0 10px var(--success); }
-        .status-dot.red { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.green { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-dot.red { background: var(--danger); box-shadow: 0 0 8px var(--danger); animation: blink 1s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-        /* Right Data Cards */
+        /* ===== DATA CARDS (right side) ===== */
         .data-card {
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .data-card h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;}
-        .data-card .value { font-size: 2rem; font-weight: 700; color: var(--accent-cyan); }
-        
-        /* AI Log */
+        .data-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px;
+            height: 100%;
+            border-radius: 3px 0 0 3px;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .data-card.cyan::before { background: var(--accent-cyan); }
+        .data-card.red::before { background: var(--danger); }
+        .data-card.green::before { background: var(--success); }
+        .data-card.yellow::before { background: var(--warning); }
+        .data-card.active::before { opacity: 1; }
+
+        .data-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem;
+        }
+        .data-card h3 {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+        .data-card .card-icon {
+            font-size: 1rem;
+        }
+        .data-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            transition: color 0.5s ease;
+        }
+        .data-card .sub-text {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* ===== RISK BREAKDOWN ===== */
+        .risk-breakdown {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .risk-breakdown h3 {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .risk-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.9rem;
+        }
+        .risk-item:last-child { margin-bottom: 0; }
+        .risk-item .risk-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .risk-item .risk-bar-wrap {
+            width: 55%;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .risk-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: var(--grad-accent);
+            width: 0%;
+            transition: width 0.8s ease;
+        }
+        .risk-bar-fill.high { background: linear-gradient(90deg, var(--warning), var(--danger)); }
+        .risk-bar-fill.medium { background: linear-gradient(90deg, var(--accent-cyan), var(--warning)); }
+        .risk-item .risk-val {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            min-width: 36px;
+            text-align: right;
+        }
+        .risk-final {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.9rem;
+            margin-top: 0.9rem;
+            border-top: 1px solid var(--card-border);
+        }
+        .risk-final .rf-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .risk-final .rf-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--warning);
+        }
+
+        /* ===== AI DECISION LOG ===== */
+        .log-section {
+            margin-top: 1rem;
+        }
+        .log-section h3 {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
         .log-container {
-            margin-top: 2rem;
-            background: #000;
+            background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--card-border);
             border-radius: 8px;
-            height: 250px;
+            height: 180px;
             overflow-y: auto;
-            padding: 1rem;
-            font-family: monospace;
-            font-size: 0.8rem;
-            color: #10b981;
+            padding: 0.8rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--success);
         }
-        .log-entry { margin-bottom: 0.5rem; }
-
+        .log-container::-webkit-scrollbar { width: 3px; }
+        .log-container::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.3); border-radius: 3px; }
+        .log-entry {
+            margin-bottom: 0.4rem;
+            line-height: 1.4;
+            opacity: 0.85;
+        }
+        .log-entry.cyan { color: var(--accent-cyan); }
+        .log-entry.warning { color: var(--warning); }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="dashboard.html" class="logo">ClaimSwift</a>
+        <a href="dashboard.html" class="logo">Giggaurd</a>
         <div class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="simulation.html" class="active">Simulation</a>
@@ -176,32 +551,73 @@
     </nav>
 
     <main>
-        <!-- LEFT: Controls -->
-        <div class="glass-panel">
-            <h2>Simulation Controls</h2>
-            
+        <!-- ===== LEFT: Smart Controls ===== -->
+        <div class="glass-panel" id="leftPanel">
+            <div class="panel-header">
+                <h2>🎛️ Simulation Controls</h2>
+                <span class="badge">Live</span>
+            </div>
+
+            <!-- 1. Rain Intensity -->
             <div class="control-group">
-                <label>1. Population</label>
-                <button class="btn sim-btn" onclick="simWorkers(200)">200 Workers <span>›</span></button>
-                <button class="btn sim-btn" onclick="simWorkers(500)">500 Workers <span>›</span></button>
-                <button class="btn sim-btn" onclick="simWorkers(1000)">1000 Workers <span>›</span></button>
+                <label>🌧️ Rain Intensity</label>
+                <div class="intensity-group" id="rainGroup">
+                    <button class="intensity-btn" data-value="low" onclick="setRainIntensity('low', this)">Low</button>
+                    <button class="intensity-btn" data-value="medium" onclick="setRainIntensity('medium', this)">Medium</button>
+                    <button class="intensity-btn" data-value="high" onclick="setRainIntensity('high', this)">High</button>
+                </div>
             </div>
 
+            <!-- 2. Delivery Drop Slider -->
             <div class="control-group">
-                <label>2. Disruptions</label>
-                <button class="btn" id="simRain" onclick="simEvent('rain')">Simulate Heavy Rain</button>
-                <button class="btn" id="simReports" onclick="simEvent('reports')">Generate Worker Reports</button>
+                <label>📦 Delivery Drop</label>
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span class="slider-value" id="sliderLabel">0%</span>
+                    </div>
+                    <input type="range" id="deliverySlider" min="0" max="100" value="0" oninput="updateSlider(this.value)">
+                </div>
             </div>
 
-            <button class="btn risk-btn" id="simRisk" onclick="runBackendSimulation()">RUN AI RISK ENGINE</button>
-
-            <!-- Logs -->
-            <div class="log-container" id="simLog">
-                <div class="log-entry">System ready. Waiting for simulation triggers...</div>
+            <!-- 3. Worker Reports -->
+            <div class="control-group">
+                <label>📝 Worker Reports</label>
+                <div class="intensity-group" id="reportGroup">
+                    <button class="intensity-btn" data-value="low" onclick="setReportLevel('low', this)">Low</button>
+                    <button class="intensity-btn" data-value="medium" onclick="setReportLevel('medium', this)">Medium</button>
+                    <button class="intensity-btn" data-value="high" onclick="setReportLevel('high', this)">High</button>
+                </div>
             </div>
+
+            <!-- 4. Surge Toggle -->
+            <div class="control-group">
+                <label>⚡ Surge Event</label>
+                <div class="toggle-row" id="surgeRow">
+                    <span class="toggle-label">Activate Surge</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="surgeToggle" onchange="toggleSurge(this.checked)">
+                        <span class="toggle-track"></span>
+                        <span class="toggle-thumb"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="run-btn" style="background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220,38,38,0.4); color: #f87171; margin-bottom: 20px;" onclick="reportSurge()">
+                🚨 Report Surge
+            </button>
+
+            <!-- 5. Run Button -->
+            <button class="run-btn" id="runEngineBtn" onclick="runBackendSimulation()">
+                🧠 Run AI Risk Engine
+            </button>
+
+            <!-- 6. View Claim Button (shown after simulation) -->
+            <button class="claim-btn" id="viewClaimBtn" onclick="window.location.href='claim.html'">
+                📋 View Claim Decision
+            </button>
         </div>
 
-        <!-- CENTER: Heatmap -->
+        <!-- ===== CENTER: Risk Map ===== -->
         <div class="map-container">
             <div class="map-status-overlay" id="mapStatus">
                 <span class="status-dot green" id="statusDot"></span>
@@ -210,137 +626,530 @@
             <canvas id="riskMapCanvas"></canvas>
         </div>
 
-        <!-- RIGHT: Data Cards -->
-        <div class="glass-panel">
-            <h2>Live Metrics</h2>
-            
-            <div class="data-card">
-                <h3>Active Workers</h3>
+        <!-- ===== RIGHT: Metrics + Breakdown + Log ===== -->
+        <div class="glass-panel" id="rightPanel">
+            <div class="panel-header">
+                <h2>📊 Live Metrics</h2>
+            </div>
+
+            <!-- Metric Cards -->
+            <div class="data-card cyan" id="cardWorkers">
+                <div class="card-header">
+                    <h3>Active Workers</h3>
+                    <span class="card-icon">👷</span>
+                </div>
                 <div class="value" id="metricWorkers">0</div>
+                <div class="sub-text">Currently in system</div>
             </div>
-            <div class="data-card">
-                <h3>Disrupted Zones</h3>
+
+            <div class="data-card red" id="cardZones">
+                <div class="card-header">
+                    <h3>Zones Affected</h3>
+                    <span class="card-icon">📍</span>
+                </div>
                 <div class="value" id="metricZones" style="color: var(--danger)">0</div>
+                <div class="sub-text">Disrupted delivery areas</div>
             </div>
-            <div class="data-card">
-                <h3>Claims Triggered</h3>
-                <div class="value" id="metricClaims">0</div>
+
+            <div class="data-card yellow" id="cardClaims">
+                <div class="card-header">
+                    <h3>Claims Triggered</h3>
+                    <span class="card-icon">📄</span>
+                </div>
+                <div class="value" id="metricClaims" style="color: var(--warning)">0</div>
+                <div class="sub-text">Auto-validated by AI</div>
             </div>
-            <div class="data-card">
-                <h3>Total Payout</h3>
+
+            <div class="data-card green" id="cardPayouts">
+                <div class="card-header">
+                    <h3>Total Payout</h3>
+                    <span class="card-icon">💰</span>
+                </div>
                 <div class="value" id="metricPayouts" style="color: var(--success)">₹0</div>
+                <div class="sub-text">Disbursed to workers</div>
             </div>
-            <div class="data-card">
-                <h3>Last Risk Score</h3>
-                <div class="value" id="metricRisk" style="color: var(--warning)">0.00</div>
+
+            <!-- Risk Breakdown -->
+            <div class="risk-breakdown" id="riskBreakdown">
+                <h3>⚙️ Risk Breakdown</h3>
+                <div class="risk-item">
+                    <span class="risk-label">Rain Impact</span>
+                    <div class="risk-bar-wrap">
+                        <div class="risk-bar"><div class="risk-bar-fill" id="rbRain"></div></div>
+                        <span class="risk-val" id="rbRainVal">0%</span>
+                    </div>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">Delivery Drop</span>
+                    <div class="risk-bar-wrap">
+                        <div class="risk-bar"><div class="risk-bar-fill" id="rbDelivery"></div></div>
+                        <span class="risk-val" id="rbDeliveryVal">0%</span>
+                    </div>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">Reports</span>
+                    <div class="risk-bar-wrap">
+                        <div class="risk-bar"><div class="risk-bar-fill" id="rbReports"></div></div>
+                        <span class="risk-val" id="rbReportsVal">0%</span>
+                    </div>
+                </div>
+                <div class="risk-final">
+                    <span class="rf-label">Final Risk Score</span>
+                    <span class="rf-value" id="rfScore">0.00</span>
+                </div>
+            </div>
+
+            <!-- AI Decision Log -->
+            <div class="log-section">
+                <h3>🖥️ AI Decision Log</h3>
+                <div class="log-container" id="simLog">
+                    <div class="log-entry cyan">[SYS] Engine ready. Configure parameters and run AI Risk Engine...</div>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- Import original simulation scripts where map logic resides -->
+    <!-- Reuse existing map logic -->
     <script src="js/riskmap.js"></script>
     <script src="js/simulation.js"></script>
 
     <script>
-        // Override the run backend simulation part to call backend API
+        // ===== SIMULATION STATE =====
+        const simControls = {
+            rainIntensity: null,     // 'low' | 'medium' | 'high'
+            deliveryDrop: 0,         // 0-100
+            reportLevel: null,       // 'low' | 'medium' | 'high'
+            surgeActive: false
+        };
+
+        // === AI ENGINE CONFIG ===
+        const AI_ENGINE_URL = 'https://gigaurdaiengine.onrender.com/predict';
+
+        // Load profile
+        window.userProfile = { platform: 'Blinkit', zone: 'Patia', income: 2500 };
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if(token) {
+                try {
+                    const res = await fetch('https://giguard.onrender.com/api/user/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const d = await res.json();
+                    if(d.success) window.userProfile = d.profile;
+                } catch(e) {}
+            }
+        });
+
+        // ===== CONTROL HANDLERS =====
+        function setRainIntensity(level, btn) {
+            simControls.rainIntensity = level;
+            document.querySelectorAll('#rainGroup .intensity-btn').forEach(b => b.classList.remove('active', 'warning', 'danger'));
+            btn.classList.add('active');
+            if (level === 'medium') btn.classList.add('warning');
+            if (level === 'high') btn.classList.add('danger');
+
+            addSimLog(`> 🌧️ Rain intensity set to ${level.toUpperCase()}`);
+            
+            if (level === 'high' || level === 'medium') {
+                if (typeof setMapState === 'function') setMapState('rain');
+            }
+        }
+
+        function updateSlider(val) {
+            simControls.deliveryDrop = parseInt(val);
+            document.getElementById('sliderLabel').textContent = val + '%';
+
+            const label = document.getElementById('sliderLabel');
+            if (val > 70) label.style.color = 'var(--danger)';
+            else if (val > 40) label.style.color = 'var(--warning)';
+            else label.style.color = 'var(--accent-cyan)';
+        }
+
+        function setReportLevel(level, btn) {
+            simControls.reportLevel = level;
+            document.querySelectorAll('#reportGroup .intensity-btn').forEach(b => b.classList.remove('active', 'warning', 'danger'));
+            btn.classList.add('active');
+            if (level === 'medium') btn.classList.add('warning');
+            if (level === 'high') btn.classList.add('danger');
+
+            addSimLog(`> 📝 Worker report level set to ${level.toUpperCase()}`);
+        }
+
+        function toggleSurge(active) {
+            simControls.surgeActive = active;
+            const row = document.getElementById('surgeRow');
+            if (active) {
+                row.classList.add('active');
+                if (typeof setMapState === 'function') setMapState('surge');
+                addSimLog('> ⚡ Surge event ACTIVATED — all zones at risk');
+            } else {
+                row.classList.remove('active');
+                if (typeof setMapState === 'function') setMapState('normal');
+                addSimLog('> ⚡ Surge event deactivated');
+            }
+        }
+
+        // 🚨 Report Surge Function
+        function reportSurge() {
+            setReportLevel('high', document.querySelector('#reportGroup button[data-value="high"]'));
+            document.getElementById('surgeToggle').checked = true;
+            toggleSurge(true);
+            runBackendSimulation();
+        }
+
+        // ===== ANIMATE METRIC VALUES =====
+        function animateVal(elId, start, end, duration, prefix, suffix) {
+            prefix = prefix || '';
+            suffix = suffix || '';
+            const el = document.getElementById(elId);
+            if (!el) return;
+            const range = end - start;
+            const startTime = performance.now();
+            function step(ts) {
+                const p = Math.min((ts - startTime) / duration, 1);
+                const current = Math.floor(start + range * p);
+                el.textContent = prefix + current.toLocaleString() + suffix;
+                if (p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // ===== ACTIVATE CARD GLOW =====
+        function activateCard(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        // ===========================================================
+        //  MAPPING: Simulation Controls → AI Engine Input
+        //  AI expects: { platform, zone, dailyIncome, workHours,
+        //                weather, reports }
+        // ===========================================================
+        function mapSimulationToAIInput() {
+            // 1. Weather: map rain intensity → "rain" or "normal"
+            const weather = simControls.rainIntensity ? 'rain' : 'normal';
+
+            // 2. Daily Income: inversely affected by delivery drop
+            const baseIncome = parseFloat(window.userProfile.income) || 2500;
+            const dropFraction = simControls.deliveryDrop / 100;
+            const dailyIncome = Math.round(baseIncome * (1 - dropFraction));
+
+            // 3. Work Hours: affected by rain + surge
+            //    High rain = fewer hours, surge = fewer hours
+            const rainHoursMap = { low: 10, medium: 7, high: 4 };
+            let workHours = simControls.rainIntensity
+                ? rainHoursMap[simControls.rainIntensity]
+                : 10 + Math.floor(Math.random() * 3); // 10-12 if no rain
+            if (simControls.surgeActive) workHours = Math.max(workHours - 2, 4);
+
+            // 4. Reports: scale level to integer (0-10)
+            const reportsMap = { low: 2, medium: 5, high: 9 };
+            const reports = simControls.reportLevel
+                ? reportsMap[simControls.reportLevel]
+                : Math.floor(Math.random() * 2); // 0-1 if none set
+
+            // 5. Platform + Zone: from user profile or defaults
+            const platform = window.userProfile.platform || 'Blinkit';
+            const zone = window.userProfile.zone || 'Patia';
+
+            return { platform, zone, dailyIncome, workHours, weather, reports };
+        }
+
+        // ===========================================================
+        //  RUN AI ENGINE — Calls real ML model
+        // ===========================================================
         async function runBackendSimulation() {
-            const riskBtn = document.getElementById('simRisk');
-            riskBtn.classList.add('triggered');
-            addSimLog('> 🧠 Routing signals to Backend APIs...');
+            const btn = document.getElementById('runEngineBtn');
+            btn.classList.add('running');
+            btn.textContent = '⏳ Connecting to AI Engine...';
 
-            // Generate random values as per user requirement
-            const rainfall_val = Math.random().toFixed(2);
-            const delivery_drop_val = Math.random().toFixed(2);
-            const report_val = Math.random().toFixed(2);
+            // Build AI-compatible payload from simulation controls
+            const aiPayload = mapSimulationToAIInput();
 
-            addSimLog(`> Payload: Rainfall=${rainfall_val}, Drops=${delivery_drop_val}, Reports=${report_val}`);
+            addSimLog(`> 🧠 Connecting to Giggaurd AI Engine...`);
+            addSimLog(`> 📡 Payload: platform=${aiPayload.platform}, zone=${aiPayload.zone}`);
+            addSimLog(`>    income=₹${aiPayload.dailyIncome}, hours=${aiPayload.workHours}h, weather=${aiPayload.weather}, reports=${aiPayload.reports}`);
+
+            // Auto-populate workers if none set
+            const currentWorkers = parseInt(document.getElementById('metricWorkers').textContent.replace(/,/g, '')) || 0;
+            if (currentWorkers === 0) {
+                const defaultWorkers = 500;
+                animateVal('metricWorkers', 0, defaultWorkers, 600);
+                activateCard('cardWorkers');
+                addSimLog(`> 👷 Auto-initialized ${defaultWorkers} workers`);
+            }
+
+            // Show initial breakdown from control values
+            const rainFraction = simControls.rainIntensity ? { low: 0.25, medium: 0.55, high: 0.85 }[simControls.rainIntensity] : 0;
+            const dropFraction = simControls.deliveryDrop / 100;
+            const reportFraction = simControls.reportLevel ? { low: 0.25, medium: 0.55, high: 0.85 }[simControls.reportLevel] : 0;
+            updateRiskBreakdown(rainFraction, dropFraction, reportFraction, 0);
 
             try {
-                // Call Node Backend
-                const response = await fetch('http://localhost:5000/api/simulation/event', {
+                // ====== CALL REAL AI ENGINE ======
+                const response = await fetch(AI_ENGINE_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        rainfall: rainfall_val,
-                        delivery_drop: delivery_drop_val,
-                        reports: report_val
-                    })
+                    body: JSON.stringify(aiPayload)
                 });
 
-                if(response.ok) {
-                    const data = await response.json();
-                    const score = data.risk_score;
-                    document.getElementById('metricRisk').textContent = parseFloat(score).toFixed(2);
-                    addSimLog(`> ✅ AI Risk Score computed: ${score}`);
-                    
-                    // Trigger payout logic
-                    finishSimulation(score);
-                } else {
-                    throw new Error("Backend not responding");
-                }
-            } catch(error) {
-                addSimLog(`> ⚠️ Backend not connected. Mocking AI Response...`);
-                const mockScore = (0.4 * rainfall_val + 0.3 * delivery_drop_val + 0.3 * report_val).toFixed(2);
-                document.getElementById('metricRisk').textContent = mockScore;
-                
-                setTimeout(() => finishSimulation(mockScore), 800);
-            }
-        }
+                if (!response.ok) throw new Error(`AI Engine returned ${response.status}`);
 
-        function finishSimulation(score) {
-            const workers = parseInt(document.getElementById('metricWorkers').textContent.replace(/,/g, '')) || 0;
-            if(workers === 0) return addSimLog('> No workers active. Aborting payout.');
+                const aiData = await response.json();
+                addSimLog(`> ✅ AI Engine responded successfully`, 'cyan');
+                addSimLog(`> 🎯 Risk: ${aiData.risk} | Fraud: ${aiData.fraud ? 'YES' : 'NO'}`, 'cyan');
 
-            // Mock system-wide claim count based on risk score
-            const systemClaimCount = Math.floor(workers * (score * 0.5));
-            const systemPayout = systemClaimCount * 250; 
-            
-            // Logged-in user's individual payout
-            const userPayout = 250;
+                // Use REAL AI data
+                finishSimulation(aiData, aiPayload, rainFraction, dropFraction, reportFraction);
 
-            // Update UI
-            document.getElementById('metricClaims').textContent = systemClaimCount.toLocaleString();
-            document.getElementById('metricPayouts').textContent = `₹${systemPayout.toLocaleString()}`;
+            } catch (error) {
+                addSimLog(`> ⚠️ AI Engine unreachable (${error.message})`, 'warning');
+                addSimLog(`> ⚠️ Cold start may take ~30s on Render free tier`, 'warning');
+                addSimLog(`> 🔄 Retrying in 3 seconds...`, 'warning');
 
-            addSimLog(`> ✅ ${systemClaimCount} Parametric Claims Automated globally.`);
-            addSimLog(`> ↗️ ₹${systemPayout.toLocaleString()} total disbursed across active workers.`);
-            
-            // UPDATE: Credit User Wallet only for their individual portion
-            const userId = localStorage.getItem("userId");
-            if(userId) {
-                fetch('http://localhost:5000/api/wallet/credit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: userId,
-                        amount: userPayout,
-                        reason: 'Simulation AI Risk Payout'
-                    })
-                }).then(res => {
-                    if(res.ok) {
-                        addSimLog(`> 💰 ₹${userPayout} successfully credited to your personal wallet.`);
+                // Retry once after delay (Render cold start)
+                setTimeout(async () => {
+                    try {
+                        const retryRes = await fetch(AI_ENGINE_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(aiPayload)
+                        });
+                        if (!retryRes.ok) throw new Error('Retry failed');
+                        const aiData = await retryRes.json();
+                        addSimLog(`> ✅ Retry successful! AI Engine connected`, 'cyan');
+                        finishSimulation(aiData, aiPayload, rainFraction, dropFraction, reportFraction);
+                    } catch (retryErr) {
+                        addSimLog(`> ❌ AI Engine offline. Generating local estimate...`, 'warning');
+                        // Fallback: generate realistic mock that matches AI output format
+                        const fallbackData = generateFallbackAIResponse(aiPayload, rainFraction, dropFraction, reportFraction);
+                        finishSimulation(fallbackData, aiPayload, rainFraction, dropFraction, reportFraction);
                     }
-                }).catch(e => {
-                    addSimLog(`> ⚠️ Failed to credit your wallet API.`);
-                });
+                }, 3000);
             }
         }
 
-        function addSimLog(msg) {
+        // ===========================================================
+        //  FALLBACK: Generate response matching AI output format
+        //  Only used when AI engine is completely unreachable
+        // ===========================================================
+        function generateFallbackAIResponse(payload, rain, delivery, reports) {
+            const risk = parseFloat((0.35 * rain + 0.30 * delivery + 0.25 * reports + (simControls.surgeActive ? 0.15 : 0)).toFixed(2));
+            const clampedRisk = Math.min(Math.max(risk, 0), 1);
+            const approved = clampedRisk >= 0.4;
+            const payout = approved ? Math.round(clampedRisk * 500) : 0;
+
+            return {
+                success: true,
+                risk: clampedRisk,
+                fraud: false,
+                events: {
+                    rain: simControls.rainIntensity !== null,
+                    surge: simControls.surgeActive
+                },
+                premium: Math.round(15 + clampedRisk * 35),
+                coverage: Math.round(200 + clampedRisk * 600),
+                claim: {
+                    approved: approved,
+                    payout: payout,
+                    reason: approved
+                        ? 'Parametric threshold exceeded — auto-approved'
+                        : 'Risk below parametric threshold — claim not triggered'
+                },
+                explanation: {
+                    factors: [
+                        `Weather: ${payload.weather} (impact: ${(rain * 100).toFixed(0)}%)`,
+                        `Delivery disruption: ${(delivery * 100).toFixed(0)}%`,
+                        `Worker reports: ${payload.reports}/10`,
+                        `Surge active: ${simControls.surgeActive ? 'Yes' : 'No'}`,
+                        `Daily income impact: ₹${payload.dailyIncome}`,
+                        `Work hours: ${payload.workHours}h`
+                    ],
+                    model: 'local-fallback',
+                    confidence: 0.7
+                },
+                _fallback: true
+            };
+        }
+
+        // ===========================================================
+        //  FINISH SIMULATION — Process AI response and update UI
+        // ===========================================================
+        function finishSimulation(aiData, aiPayload, rainVal, deliveryVal, reportVal) {
+            const btn = document.getElementById('runEngineBtn');
+            btn.classList.remove('running');
+            btn.innerHTML = '🧠 Run AI Risk Engine';
+
+            const workers = parseInt(document.getElementById('metricWorkers').textContent.replace(/,/g, '')) || 500;
+
+            // === Extract from REAL AI response ===
+            const risk = parseFloat(aiData.risk) || 0;
+            const fraud = aiData.fraud || false;
+            const premium = aiData.premium || 30;
+            const coverage = aiData.coverage || 400;
+            const claim = aiData.claim || { approved: false, payout: 0 };
+            const explanation = aiData.explanation || {};
+            const events = aiData.events || {};
+
+            // OVERRIDE: Enforce parametric threshold locally.
+            // If the AI Engine (which may be a mocked iteration) returns false but risk is high:
+            if (risk >= 0.4 && !claim.approved) {
+                claim.approved = true;
+                claim.payout = claim.payout || Math.round(risk * 500);
+                claim.reason = 'Parametric threshold exceeded — auto-approved';
+            }
+
+            // Sync events with frontend UI state for the claim summary
+            events.rain = events.rain || (simControls.rainIntensity !== null);
+            events.surge = events.surge || simControls.surgeActive;
+
+            // Update risk breakdown with actual AI risk
+            updateRiskBreakdown(rainVal, deliveryVal, reportVal, risk);
+
+            // Compute system-wide impact from AI risk
+            const zonesAffected = Math.min(Math.floor(risk * 8) + 1, 6);
+            const systemClaimCount = Math.floor(workers * (risk * 0.5));
+            const systemPayout = claim.approved ? systemClaimCount * (claim.payout || 250) : 0;
+            const userPayout = claim.payout || 0;
+
+            // Update map state based on AI events + risk
+            if (events.surge && typeof setMapState === 'function') setMapState('surge');
+            else if (events.rain && typeof setMapState === 'function') setMapState('rain');
+            else if (risk > 0.7 && typeof setMapState === 'function') setMapState('surge');
+            else if (risk > 0.4 && typeof setMapState === 'function') setMapState('rain');
+
+            // Animate metrics
+            animateVal('metricZones', 0, zonesAffected, 600);
+            activateCard('cardZones');
+
+            setTimeout(() => {
+                animateVal('metricClaims', 0, systemClaimCount, 1000);
+                activateCard('cardClaims');
+            }, 400);
+
+            setTimeout(() => {
+                animateVal('metricPayouts', 0, systemPayout, 1200, '₹');
+                activateCard('cardPayouts');
+            }, 800);
+
+            // Log AI results
+            addSimLog(`> 🎯 AI Risk Score: ${risk.toFixed(2)}`, 'cyan');
+            if (fraud) addSimLog(`> 🚨 FRAUD DETECTED — claim flagged for review`, 'warning');
+            addSimLog(`> 💎 Premium: ₹${premium} | Coverage: ₹${coverage}`);
+            addSimLog(`> ${claim.approved ? '✅' : '❌'} Claim: ${claim.approved ? 'APPROVED' : 'REJECTED'} — Payout: ₹${userPayout}`);
+            if (claim.reason) addSimLog(`> 📝 Reason: ${claim.reason}`);
+            addSimLog(`> ✅ ${systemClaimCount} parametric claims auto-validated`);
+            addSimLog(`> 💰 ₹${systemPayout.toLocaleString()} total disbursed across ${zonesAffected} zones`);
+            if (aiData._fallback) addSimLog(`> ⚠️ Results from local fallback model`, 'warning');
+
+            // Credit user wallet (if claim approved)
+            if (claim.approved) {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    fetch('https://giguard.onrender.com/api/wallet/credit', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            amount: userPayout,
+                            reason: 'AI Risk Engine Payout'
+                        })
+                    }).then(res => {
+                        if (res.ok) addSimLog(`> 💰 ₹${userPayout} credited to your wallet`, 'cyan');
+                    }).catch(() => {
+                        addSimLog(`> ⚠️ Wallet API unavailable`, 'warning');
+                    });
+                }
+            }
+
+            // === STORE FULL AI RESULT FOR CLAIM PAGE ===
+            const simResult = {
+                risk: risk,
+                premium: premium,
+                coverage: coverage,
+                fraud: fraud,
+                explanation: explanation,
+                events: {
+                    rain: events.rain || false,
+                    surge: events.surge || false,
+                    rainIntensity: simControls.rainIntensity || 'none',
+                    deliveryDrop: simControls.deliveryDrop,
+                    reportLevel: simControls.reportLevel || 'none'
+                },
+                claim: {
+                    approved: claim.approved,
+                    payout: userPayout,
+                    reason: claim.reason || '',
+                    workersAffected: systemClaimCount,
+                    zonesImpacted: zonesAffected,
+                    totalPayout: systemPayout
+                },
+                aiPayload: aiPayload,
+                timestamp: new Date().toISOString(),
+                _fallback: aiData._fallback || false
+            };
+            
+            // POST to backend instead of localStorage
+            const tokenCache = localStorage.getItem('token');
+            fetch('https://giguard.onrender.com/api/simulation/result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${tokenCache}`
+                },
+                body: JSON.stringify(simResult)
+            }).then(() => {
+                addSimLog(`> 📋 Full AI result saved to DB. View claim decision →`, 'cyan');
+                document.getElementById('viewClaimBtn').classList.add('show');
+            }).catch(e => {
+                addSimLog(`> ⚠️ Failed to save simulation to DB`, 'danger');
+            });
+        }
+
+        // ===========================================================
+        //  RISK BREAKDOWN — Visual bars from control inputs
+        // ===========================================================
+        function updateRiskBreakdown(rain, delivery, reports, finalScore) {
+            const r = Math.round(rain * 100);
+            const d = Math.round(delivery * 100);
+            const rp = Math.round(reports * 100);
+            const fs = parseFloat(finalScore).toFixed(2);
+
+            document.getElementById('rbRain').style.width = r + '%';
+            document.getElementById('rbRainVal').textContent = r + '%';
+            document.getElementById('rbRain').className = 'risk-bar-fill' + (r > 60 ? ' high' : r > 35 ? ' medium' : '');
+
+            document.getElementById('rbDelivery').style.width = d + '%';
+            document.getElementById('rbDeliveryVal').textContent = d + '%';
+            document.getElementById('rbDelivery').className = 'risk-bar-fill' + (d > 60 ? ' high' : d > 35 ? ' medium' : '');
+
+            document.getElementById('rbReports').style.width = rp + '%';
+            document.getElementById('rbReportsVal').textContent = rp + '%';
+            document.getElementById('rbReports').className = 'risk-bar-fill' + (rp > 60 ? ' high' : rp > 35 ? ' medium' : '');
+
+            const rfEl = document.getElementById('rfScore');
+            rfEl.textContent = fs;
+            if (finalScore > 0.7) rfEl.style.color = 'var(--danger)';
+            else if (finalScore > 0.4) rfEl.style.color = 'var(--warning)';
+            else rfEl.style.color = 'var(--accent-cyan)';
+        }
+
+        // ===== LOGGING =====
+        function addSimLog(msg, type) {
             const logEl = document.getElementById('simLog');
-            if(logEl) {
-                const entry = document.createElement('div');
-                entry.className = 'log-entry';
-                const ts = new Date().toLocaleTimeString();
-                entry.textContent = `[${ts}] ${msg}`;
-                logEl.appendChild(entry);
-                logEl.scrollTop = logEl.scrollHeight;
-            }
+            if (!logEl) return;
+            const entry = document.createElement('div');
+            entry.className = 'log-entry' + (type ? ' ' + type : '');
+            const ts = new Date().toLocaleTimeString();
+            entry.textContent = `[${ts}] ${msg}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
         }
 
-        // Initialize empty state globally on load
+        // ===== INIT =====
         document.addEventListener('DOMContentLoaded', () => {
-            if(typeof setMapState === 'function') setMapState('normal');
+            if (typeof setMapState === 'function') setMapState('normal');
         });
     </script>
 </body>

@@ -205,14 +205,25 @@
     <div class="toast" id="toast">Payment Successful! Redirecting...</div>
 
     <script>
-        // Load data from localStorage (saved from buy-policy page)
-        document.addEventListener('DOMContentLoaded', () => {
-            const pendingPolicy = JSON.parse(localStorage.getItem('pendingPolicy'));
-            if(pendingPolicy) {
-                document.getElementById('disp-platform').textContent = pendingPolicy.platform;
-                document.getElementById('disp-zone').textContent = pendingPolicy.zone;
-                document.getElementById('disp-coverage').textContent = `₹${pendingPolicy.coverage} / day`;
-                document.getElementById('disp-premium').textContent = `₹${pendingPolicy.premium}`;
+        // Load pending policy from backend
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if(token) {
+                try {
+                    const res = await fetch('https://giguard.onrender.com/api/policy/pending', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    if(data.success && data.pendingPolicy) {
+                        const pp = data.pendingPolicy;
+                        document.getElementById('disp-platform').textContent = pp.platform;
+                        document.getElementById('disp-zone').textContent = pp.zone;
+                        document.getElementById('disp-coverage').textContent = `₹${pp.coverage} / day`;
+                        document.getElementById('disp-premium').textContent = `₹${pp.premium}`;
+                    }
+                } catch(e) {
+                    console.error("Failed to load pending policy", e);
+                }
             }
         });
 
@@ -225,47 +236,37 @@
             targetBtn.querySelector('.btn-text').style.display = 'none';
             targetBtn.querySelector('.loader').style.display = 'block';
 
-            // Simulate API call to backend /activate-policy
+            // Final API call to backend /activate
             setTimeout(async () => {
-                const pendingPolicy = JSON.parse(localStorage.getItem('pendingPolicy')) || {};
-                
+                const token = localStorage.getItem('token');
                 try {
-                    const res = await fetch('http://localhost:5000/api/policy/activate', {
+                    const res = await fetch('https://giguard.onrender.com/api/policy/activate', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            userId: "mock-user-123", // In a real app, from auth token
-                            ...pendingPolicy,
-                            paymentMethod: method
-                        })
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        body: JSON.stringify({ paymentMethod: method })
                     });
                     
-                    // Whether backend is ready or not, simulate success for demo
                     const toast = document.getElementById('toast');
                     toast.classList.add('show');
-                    
-                    // Clear pending policy and set as active in local storage for frontend mockup
-                    localStorage.removeItem('pendingPolicy');
-                    localStorage.setItem('hasActivePolicy', 'true');
                     
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1500);
 
                 } catch(error) {
-                    console.log('Backend not ready yet, using mock success');
+                    console.log('Backend not ready yet/error');
                     const toast = document.getElementById('toast');
                     toast.classList.add('show');
                     
-                    localStorage.removeItem('pendingPolicy');
-                    localStorage.setItem('hasActivePolicy', 'true');
-
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1500);
                 }
 
-            }, 1500);
+            }, 1000);
         }
     </script>
 </body>

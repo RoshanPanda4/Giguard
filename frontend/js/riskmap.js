@@ -39,20 +39,22 @@
     ];
 
     // Fetch user zone dynamically
-    const userId = localStorage.getItem("userId");
-    if (userId) {
-        fetch(`http://localhost:5000/api/user/${userId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.user && data.user.zone) {
-                    // check if their zone exists, if not, mutate index 0
-                    const exists = deliveryZones.find(dz => dz.name === data.user.zone);
-                    if (!exists) {
-                        deliveryZones[0].name = data.user.zone;
-                    }
+    const token = localStorage.getItem("token");
+    if (token) {
+        fetch('https://giguard.onrender.com/api/user/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.profile && data.profile.zone) {
+                // check if their zone exists, if not, mutate index 0
+                const exists = deliveryZones.find(dz => dz.name === data.profile.zone);
+                if (!exists) {
+                    deliveryZones[0].name = data.profile.zone;
                 }
-            })
-            .catch(err => console.error("Error fetching user zone:", err));
+            }
+        })
+        .catch(err => console.error("Error fetching user zone:", err));
     }
 
     // Workers
@@ -219,14 +221,18 @@
     window.setMapState = function (state) {
         mapState = state;
 
-        // Update button styles
+        // Update button styles (buttons may not exist on simulation dashboard)
         document.querySelectorAll('.map-btn').forEach(b => b.classList.remove('active'));
-        if (state === 'normal') document.getElementById('btnNormal').classList.add('active');
-        if (state === 'rain') document.getElementById('btnRain').classList.add('active');
-        if (state === 'surge') document.getElementById('btnSurge').classList.add('active');
+        const btnNormal = document.getElementById('btnNormal');
+        const btnRain = document.getElementById('btnRain');
+        const btnSurge = document.getElementById('btnSurge');
+        if (state === 'normal' && btnNormal) btnNormal.classList.add('active');
+        if (state === 'rain' && btnRain) btnRain.classList.add('active');
+        if (state === 'surge' && btnSurge) btnSurge.classList.add('active');
 
         // Update status indicator
         const statusEl = document.getElementById('mapStatus');
+        if (!statusEl) return;
         if (state === 'normal') {
             statusEl.innerHTML = '<span class="status-dot green"></span> All zones operational';
         } else if (state === 'rain') {

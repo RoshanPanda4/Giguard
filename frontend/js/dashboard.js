@@ -1,3 +1,4 @@
+const API_BASE = "https://giguard.onrender.com/api";
 const token = localStorage.getItem("token");
 
 // ================== AUTH CHECK ==================
@@ -13,23 +14,38 @@ function logout(e) {
 }
 
 // ================== USER GREETING ==================
-function loadUser() {
-    const userName = localStorage.getItem("userName");
-    const photo = localStorage.getItem("userPhoto");
+async function loadUser() {
+    try {
+        const res = await fetch(`${API_BASE}/user/profile`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.success && data.profile) {
+            const userName = data.profile.name;
+            const photo = data.profile.photo;
 
-    if (userName && document.getElementById("userGreeting")) {
-        document.getElementById("userGreeting").innerText = `Hello, ${userName}! 👋`;
-    }
+            if (userName && document.getElementById("userGreeting")) {
+                document.getElementById("userGreeting").innerText = `Hello, ${userName}! 👋`;
+            }
 
-    if (photo && document.getElementById("profileImage")) {
-        document.getElementById("profileImage").src = photo;
+            if (photo && document.getElementById("profileImage")) {
+                let displayPhoto = photo;
+                if (photo.startsWith('/usrphotos')) {
+                    displayPhoto = API_BASE.replace('/api', '') + photo;
+                }
+                document.getElementById("profileImage").src = displayPhoto;
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load user profile", err);
     }
 }
 
 // ================== FETCH WALLET ==================
 async function loadWallet() {
     try {
-        const res = await fetch("/api/wallet/me", {
+        const res = await fetch(`${API_BASE}/wallet/me`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -48,7 +64,7 @@ async function loadWallet() {
 // ================== FETCH POLICY ==================
 async function loadPolicy() {
     try {
-        const res = await fetch("/api/policy/me", {
+        const res = await fetch(`${API_BASE}/policy/me`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -95,7 +111,7 @@ async function loadPolicy() {
 // ================== LOAD HISTORY ==================
 async function loadHistory() {
     try {
-        const res = await fetch("/api/wallet/history", {
+        const res = await fetch(`${API_BASE}/wallet/history`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -137,7 +153,7 @@ async function loadHistory() {
 // ================== WITHDRAW ==================
 async function withdrawFunds() {
     try {
-        const res = await fetch("/api/wallet/withdraw", {
+        const res = await fetch(`${API_BASE}/wallet/withdraw`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -178,7 +194,7 @@ function setupPhotoUpload() {
         formData.append("photo", file);
 
         try {
-            const res = await fetch("/api/user/upload-photo", {
+            const res = await fetch(`${API_BASE}/user/upload-photo`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -189,10 +205,21 @@ function setupPhotoUpload() {
             const data = await res.json();
 
             if (data.url && profileImage) {
-                profileImage.src = data.url;
+                let displayPhoto = data.url;
+                if (data.url.startsWith('/usrphotos')) {
+                    displayPhoto = API_BASE.replace('/api', '') + data.url;
+                }
+                profileImage.src = displayPhoto;
 
-                // Save locally
-                localStorage.setItem("userPhoto", data.url);
+                // Update the user's permanent profile string
+                await fetch(`${API_BASE}/user/profile`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ photo: data.url })
+                });
             }
 
         } catch (err) {

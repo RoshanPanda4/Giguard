@@ -7,7 +7,7 @@ const { db } = require('../config/firebase');
 // ============================
 exports.signup = async (req, res) => {
     try {
-        const { name, phone, password } = req.body;
+        const { name, phone, password, platform, zone, income } = req.body;
 
         if (!name || !phone || !password) {
             return res.status(400).json({ error: "All fields required" });
@@ -34,6 +34,9 @@ exports.signup = async (req, res) => {
             name,
             phone: cleanPhone,
             password: hashedPassword,
+            platform: platform || "Blinkit",
+            zone: zone || "Patia",
+            income: parseFloat(income) || 1200,
             createdAt: new Date()
         });
 

@@ -172,10 +172,8 @@ loginForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ phone, password })
         });
 
-        // SAVE AUTH DATA
+        // SAVE AUTH DATA (ONLY TOKEN NOW)
         setToken(data.token);
-        localStorage.setItem("userId", data.userId);
-        localStorage.setItem("userName", data.name);
 
         setButtonLoading('loginBtn', false);
         showToast("Login successful");

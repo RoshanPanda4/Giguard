@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Decision — Giggaurd</title>
+    <meta name="description" content="Giggaurd AI-powered parametric insurance claim decision — instant automated payouts for gig workers">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f17;
+            --card-bg: rgba(20, 26, 38, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-cyan: #00f0ff;
+            --accent-blue: #3b82f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --grad-accent: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%;
+            left: -10%;
+            width: 45%;
+            height: 45%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%;
+            right: -10%;
+            width: 45%;
+            height: 45%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ===== NAVBAR ===== */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(11, 15, 23, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--grad-accent);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-cyan); }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            flex: 1;
+            padding: 2.5rem 5%;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        .page-header .gradient-text {
+            background: var(--grad-accent);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ===== GLASS CARD ===== */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.8rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ===== 1. AI EXPLANATION CARD ===== */
+        .explanation-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .explanation-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        .explanation-list li::before {
+            content: '→';
+            color: var(--accent-cyan);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ===== 2. EVENT SUMMARY ===== */
+        .event-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .event-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .event-item.active {
+            border-color: rgba(0, 240, 255, 0.2);
+        }
+        .event-item.inactive {
+            opacity: 0.5;
+        }
+        .event-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(0, 240, 255, 0.08);
+            flex-shrink: 0;
+        }
+        .event-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .event-value {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 0.15rem;
+        }
+
+        /* ===== 3. CLAIM DECISION (HIGHLIGHTED) ===== */
+        .decision-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .decision-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            border-radius: 50%;
+            opacity: 0.06;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .decision-card.approved {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .decision-card.approved::before {
+            background: radial-gradient(circle, var(--success) 0%, transparent 60%);
+        }
+        .decision-card.rejected {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        .decision-card.rejected::before {
+            background: radial-gradient(circle, var(--danger) 0%, transparent 60%);
+        }
+        
+        .decision-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .decision-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 1.2rem;
+        }
+        .decision-status.approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .decision-status.rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .decision-status .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+
+        .decision-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .decision-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+        }
+        .decision-item .d-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+        .decision-item .d-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .decision-reason {
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid var(--text-muted);
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ===== 4. SYSTEM IMPACT ===== */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .impact-item {
+            text-align: center;
+            padding: 1.2rem 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .impact-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+        .impact-icon {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .impact-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.3rem;
+        }
+        .impact-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== 5. CTA BUTTON ===== */
+        .cta-section {
+            text-align: center;
+            padding: 0.5rem 0 1rem;
+        }
+        .btn-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            border: none;
+            background: var(--grad-accent);
+            color: #0b0f17;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.3);
+            text-decoration: none;
+        }
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.4);
+        }
+        .btn-cta:active {
+            transform: translateY(0);
+        }
+        .btn-cta.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            text-decoration: none;
+            margin-left: 1rem;
+        }
+        .btn-secondary:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .empty-state.show { display: flex; }
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+        .empty-state h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 400px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            main { padding: 1.5rem 4%; }
+            .page-header h1 { font-size: 1.5rem; }
+            .event-grid { grid-template-columns: 1fr; }
+            .decision-grid { grid-template-columns: 1fr; }
+            .impact-grid { grid-template-columns: 1fr; }
+            .glass-card { padding: 1.3rem; }
+            .cta-section { flex-direction: column; }
+            .btn-secondary { margin-left: 0; margin-top: 0.8rem; }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR (same as dashboard) -->
+    <nav>
+        <a href="dashboard.html" class="logo">Giggaurd</a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="simulation.html">Simulation</a>
+            <a href="analytics.html">Analytics</a>
+            <a href="claim.html" class="active">Claim</a>
+        </div>
+    </nav>
+
+    <main id="claimContent">
+        <!-- Page Header -->
+        <div class="page-header animate-in">
+            <h1>🧠 <span class="gradient-text">AI Claim Decision</span></h1>
+            <p>Automated parametric claim analysis powered by Giggaurd AI Engine</p>
+        </div>
+
+        <!-- 1. AI Explanation Card -->
+        <div class="glass-card animate-in delay-1" id="explanationCard">
+            <div class="card-title">🧠 AI Explanation</div>
+            <ul class="explanation-list" id="explanationList">
+                <!-- Populated by JS -->
+            </ul>
+        </div>
+
+        <!-- 2. Event Summary Card -->
+        <div class="glass-card animate-in delay-2" id="eventCard">
+            <div class="card-title">🌧️ Event Summary</div>
+            <div class="event-grid" id="eventGrid">
+                <div class="event-item" id="evtRain">
+                    <div class="event-icon">🌧️</div>
+                    <div>
+                        <div class="event-label">Rain Detected</div>
+                        <div class="event-value" id="evtRainVal">—</div>
+                    </div>
+                </div>
+                <div class="event-item" id="evtSurge">
+                    <div class="event-icon">⚡</div>
+                    <div>
+                        <div class="event-label">Surge Detected</div>
+                        <div class="event-value" id="evtSurgeVal">—</div>
+                    </div>
+                </div>
+                <div class="event-item" id="evtDelivery">
+                    <div class="event-icon">📦</div>
+                    <div>
+                        <div class="event-label">Delivery Drop</div>
+                        <div class="event-value" id="evtDeliveryVal">—</div>
+                    </div>
+                </div>
+                <div class="event-item" id="evtReports">
+                    <div class="event-icon">📝</div>
+                    <div>
+                        <div class="event-label">Worker Reports</div>
+                        <div class="event-value" id="evtReportsVal">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Claim Decision Card (HIGHLIGHTED) -->
+        <div class="glass-card decision-card animate-in delay-3" id="decisionCard">
+            <div class="card-title">💰 Claim Decision</div>
+            <div class="decision-content">
+                <div class="decision-status" id="decisionStatus">
+                    <span class="status-dot"></span>
+                    <span id="decisionText">—</span>
+                </div>
+                <div class="decision-grid">
+                    <div class="decision-item">
+                        <div class="d-label">Your Payout</div>
+                        <div class="d-value" id="decPayout" style="color: var(--success);">₹0</div>
+                    </div>
+                    <div class="decision-item">
+                        <div class="d-label">Risk Score</div>
+                        <div class="d-value" id="decRisk" style="color: var(--warning);">0.00</div>
+                    </div>
+                </div>
+                <div class="decision-reason" id="decisionReason" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- 4. System Impact Card -->
+        <div class="glass-card animate-in delay-4" id="impactCard">
+            <div class="card-title">📊 System Impact</div>
+            <div class="impact-grid">
+                <div class="impact-item">
+                    <div class="impact-icon">👷</div>
+                    <div class="impact-value" id="impWorkers">0</div>
+                    <div class="impact-label">Workers Affected</div>
+                </div>
+                <div class="impact-item">
+                    <div class="impact-icon">💰</div>
+                    <div class="impact-value" id="impPayout" style="color: var(--success);">₹0</div>
+                    <div class="impact-label">Total Payout</div>
+                </div>
+                <div class="impact-item">
+                    <div class="impact-icon">📍</div>
+                    <div class="impact-value" id="impZones" style="color: var(--danger);">0</div>
+                    <div class="impact-label">Zones Impacted</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. CTA -->
+        <div class="cta-section animate-in delay-5" id="ctaSection">
+            <a href="payment.html" class="btn-cta" id="ctaBtn">
+                🚀 Proceed to Payment
+            </a>
+            <a href="simulation.html" class="btn-secondary">
+                ← Back to Simulation
+            </a>
+        </div>
+    </main>
+
+    <!-- Empty State (shown if no simulation data) -->
+    <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🔍</div>
+        <h2>No Simulation Data Found</h2>
+        <p>Run a simulation first to generate a claim decision. The AI engine will analyze disruption signals and determine your payout.</p>
+        <a href="simulation.html" class="btn-cta">🎛️ Go to Simulation</a>
+    </div>
+
+    <script src="js/claim.js"></script>
+</body>
+</html>

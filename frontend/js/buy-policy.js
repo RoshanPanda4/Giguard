@@ -14,6 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const activateBtn = document.getElementById('activate-btn');
 
+    // Auto-fill form data from user dashboard (via backend profile)
+    const token = localStorage.getItem('token');
+    if (token) {
+        fetch('https://giguard.onrender.com/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.profile) {
+                    const p = data.profile;
+                    if (p.name) document.getElementById('name').value = p.name;
+                    if (p.platform) document.getElementById('platform').value = p.platform;
+                    if (p.zone) document.getElementById('zone').value = p.zone;
+                    if (p.income) document.getElementById('daily-income').value = p.income;
+                }
+            })
+            .catch(err => console.log('Profile fetch error:', err));
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -33,11 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
         generateBtn.disabled = true;
 
         try {
-            // 🔥 FIXED API CALL
-            const res = await fetch('https://giguard.onrender.com/api/simulation', {
+            // Call the correct AI Engine to get dynamic pricing
+            const aiPayload = {
+                platform,
+                zone,
+                dailyIncome,
+                workHours,
+                weather: 'normal',
+                reports: 0
+            };
+
+            const res = await fetch('https://gigaurdaiengine.onrender.com/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ platform, zone, dailyIncome, workHours })
+                body: JSON.stringify(aiPayload)
             });
 
             const data = await res.json();
@@ -49,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
             generateBtn.disabled = false;
 
             if(res.ok && data.success) {
+                // Store globally so the activate button can use it
+                window.generatedPolicy = { coverage: data.coverage, premium: data.premium, zone, platform };
                 showGeneratedPolicy(data);
             } else {
                 showToast(data.error || 'Failed to generate policy', 'error');
@@ -59,24 +87,51 @@ document.addEventListener('DOMContentLoaded', () => {
             loader.classList.add('hidden');
             loadingText.classList.add('hidden');
             generateBtn.disabled = false;
-            showToast('Server error connecting to backend API.', 'error');
+            showToast('Server error connecting to AI API.', 'error');
         }
     });
 
+    activateBtn.addEventListener('click', async () => {
+        activateBtn.disabled = true;
+        activateBtn.textContent = 'Redirecting to Payment...';
+        
+        // Save the dynamic AI policy details to BACKEND for the payment page to display
+        if (window.generatedPolicy) {
+            try {
+                await fetch('https://giguard.onrender.com/api/policy/pending', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(window.generatedPolicy)
+                });
+            } catch (err) {
+                console.error("Failed to post pending policy", err);
+            }
+        }
+
+        // Navigate to payment page
+        setTimeout(() => {
+            window.location.href = 'payment.html';
+        }, 500);
+    });
+
     function showGeneratedPolicy(data) {
-        // 🔥 FIXED DATA KEYS
-        riskScoreValue.textContent = data.zoneRisk.toFixed(2);
+        // Map to exact AI properties
+        const risk = parseFloat(data.risk) || 0;
+        riskScoreValue.textContent = risk.toFixed(2);
         displayPremium.textContent = `₹${data.premium} / week`;
         displayCoverage.textContent = `₹${data.coverage}`;
 
         let riskText = 'Low';
         let riskClass = 'risk-low';
-        let progressPercent = (data.zoneRisk / 1.0) * 100;
+        let progressPercent = (risk / 1.0) * 100;
 
-        if (data.zoneRisk >= 0.7) {
+        if (risk >= 0.7) {
             riskText = 'High';
             riskClass = 'risk-high';
-        } else if (data.zoneRisk >= 0.65) {
+        } else if (risk >= 0.4) {
             riskText = 'Medium';
             riskClass = 'risk-medium';
         }
