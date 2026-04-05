@@ -18,14 +18,17 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container"></div>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <div class="container">
         <!-- PAGE HEADER -->
         <header class="page-header">
             <div class="badge-container">
                 <span class="badge badge-ai">✨ AI Risk Engine</span>
             </div>
-            <h1>Generate Your Insurance Policy</h1>
-            <p class="subtitle">AI-powered protection for gig delivery workers</p>
+            <h1 data-i18n="buy_policy_title">Generate Your Insurance Policy</h1>
+            <p class="subtitle" data-i18n="buy_policy_desc">AI-powered protection for gig delivery workers</p>
         </header>
 
         <!-- MAIN PAGE LAYOUT -->
@@ -34,22 +37,22 @@
             <!-- SECTION 1 — WORKER RISK PROFILE -->
             <section class="glass-card column form-column">
                 <div class="card-header">
-                    <h2>Worker Risk Profile</h2>
-                    <p class="helper-text">Our AI calculates your personalized insurance premium based on your zone risk and income patterns.</p>
+                    <h2 data-i18n="policy_details_title">Worker Risk Profile</h2>
+                    <p class="helper-text" data-i18n="risk_desc">Our AI calculates your personalized insurance premium based on your zone risk and income patterns.</p>
                 </div>
 
                 <form id="risk-form" class="risk-form">
                     <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" placeholder="Enter your full name" required>
+                        <label for="name" data-i18n="name_placeholder">Name</label>
+                        <input type="text" id="name" placeholder="Enter your full name" required data-i18n="name_placeholder">
                     </div>
 
                     <div class="form-group row">
                         <div class="form-col">
-                            <label for="platform">Delivery Platform</label>
+                            <label for="platform" data-i18n="platform_placeholder">Delivery Platform</label>
                             <div class="select-wrapper">
                                 <select id="platform" required>
-                                    <option value="" disabled selected>Select platform</option>
+                                    <option value="" disabled selected data-i18n="select_platform">Select platform</option>
                                     <option value="JioMart">JioMart</option>
                                     <option value="Instamart">Instamart</option>
                                     <option value="Blinkit">Blinkit</option>
@@ -59,10 +62,10 @@
                         </div>
 
                         <div class="form-col">
-                            <label for="zone">Work Zone</label>
+                            <label for="zone" data-i18n="zone_placeholder">Work Zone</label>
                             <div class="select-wrapper">
                                 <select id="zone" required>
-                                    <option value="" disabled selected>Select primary zone</option>
+                                    <option value="" disabled selected data-i18n="select_zone">Select primary zone</option>
                                     <option value="Patia">Patia</option>
                                     <option value="KIIT">KIIT</option>
                                     <option value="Khandagiri">Khandagiri</option>
@@ -74,8 +77,8 @@
 
                     <div class="form-group row">
                         <div class="form-col">
-                            <label for="daily-income">Average Daily Income (₹)</label>
-                            <input type="number" id="daily-income" placeholder="e.g. 1200" min="100" required>
+                            <label for="daily-income" data-i18n="income_placeholder">Average Daily Income (₹)</label>
+                            <input type="number" id="daily-income" placeholder="e.g. 1200" min="100" required data-i18n="income_placeholder">
                         </div>
 
                         <div class="form-col">
@@ -85,10 +88,10 @@
                     </div>
 
                     <button type="submit" id="generate-btn" class="btn btn-primary btn-large glow-btn">
-                        <span class="btn-text">Generate Dynamic Policy</span>
+                        <span class="btn-text" data-i18n="calc_premium">Generate Dynamic Policy</span>
                         <div class="loader hidden"></div>
                     </button>
-                    <p id="loading-text" class="loading-text hidden">AI analyzing risk patterns...</p>
+                    <p id="loading-text" class="loading-text hidden" data-i18n="loading">AI analyzing risk patterns...</p>
                 </form>
             </section>
 
@@ -103,7 +106,7 @@
                     <!-- Risk Visualization -->
                     <div class="risk-meter-container">
                         <div class="flex-between">
-                            <span class="label">Risk Level: <span id="risk-level-text" class="risk-text">Medium</span></span>
+                            <span class="label"><span data-i18n="current_risk">Risk Level</span>: <span id="risk-level-text" class="risk-text">Medium</span></span>
                             <span id="risk-score-value" class="value">0.72</span>
                         </div>
                         <div class="progress-bar-bg">
@@ -113,11 +116,11 @@
 
                     <div class="policy-details">
                         <div class="detail-row">
-                            <span class="label">Weekly Premium</span>
+                            <span class="label" data-i18n="weekly_premium">Weekly Premium</span>
                             <span id="display-premium" class="value highlight">₹30 / week</span>
                         </div>
                         <div class="detail-row">
-                            <span class="label">Coverage Amount</span>
+                            <span class="label" data-i18n="coverage_amount">Coverage Amount</span>
                             <span id="display-coverage" class="value">₹400 / day</span>
                         </div>
                         <div class="detail-row">
@@ -132,7 +135,7 @@
 
                     <!-- SECTION 3 — ACTIVATE POLICY -->
                     <div class="activation-section">
-                        <button id="activate-btn" class="btn btn-accent btn-large glow-btn">Activate Policy</button>
+                        <button id="activate-btn" class="btn btn-accent btn-large glow-btn" data-i18n="buy_policy">Activate Policy</button>
                     </div>
                 </div>
 
@@ -159,6 +162,13 @@
         </main>
     </div>
 
+    </div>
+
+    </div>
+
+    <script src="js/translations.js"></script>
+
+    <script src="js/translations.js"></script>
     <script src="js/buy-policy.js"></script>
 </body>
 </html>

@@ -1,3 +1,8 @@
+function toggleLanguage() {
+    const newLang = i18n.currentLang === 'en' ? 'hi' : 'en';
+    i18n.setLanguage(newLang);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('risk-form');
     const generateBtn = document.getElementById('generate-btn');

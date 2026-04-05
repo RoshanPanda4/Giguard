@@ -105,3 +105,70 @@ exports.login = async (req, res) => {
         res.status(500).json({ error: "Login failed" });
     }
 };
+
+// ============================
+// FORGOT PASSWORD
+// ============================
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { phone } = req.body;
+        if (!phone) return res.status(400).json({ error: "Phone required" });
+
+        const userSnap = await db.collection('users').where('phone', '==', phone.trim()).limit(1).get();
+        if (userSnap.empty) return res.status(404).json({ error: "User not found" });
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
+
+        await db.collection('otp').doc(phone.trim()).set({
+            otp,
+            expiresAt,
+            createdAt: new Date()
+        });
+
+        // In production, send via SMS. For now, return in response as requested.
+        res.json({ success: true, message: "OTP sent", otp });
+
+    } catch (err) {
+        console.error("FORGOT PW ERROR:", err);
+        res.status(500).json({ error: "Failed to process forgot password" });
+    }
+};
+
+// ============================
+// RESET PASSWORD
+// ============================
+exports.resetPassword = async (req, res) => {
+    try {
+        const { phone, otp, newPassword } = req.body;
+        if (!phone || !otp || !newPassword) return res.status(400).json({ error: "All fields required" });
+
+        const otpDoc = await db.collection('otp').doc(phone.trim()).get();
+        if (!otpDoc.exists) return res.status(400).json({ error: "Invalid OTP session" });
+
+        const otpData = otpDoc.data();
+        if (otpData.otp !== otp) return res.status(400).json({ error: "Invalid OTP" });
+        if (newPassword.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+        if (otpData.expiresAt.toDate() < new Date()) {
+            return res.status(400).json({ error: "OTP expired" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const userSnap = await db.collection('users').where('phone', '==', phone.trim()).limit(1).get();
+        
+        if (userSnap.empty) return res.status(404).json({ error: "User not found" });
+
+        await db.collection('users').doc(userSnap.docs[0].id).update({
+            password: hashedPassword
+        });
+
+        // Delete OTP
+        await db.collection('otp').doc(phone.trim()).delete();
+
+        res.json({ success: true, message: "Password updated successfully" });
+
+    } catch (err) {
+        console.error("RESET PW ERROR:", err);
+        res.status(500).json({ error: "Failed to reset password" });
+    }
+};

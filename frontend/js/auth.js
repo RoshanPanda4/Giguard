@@ -193,10 +193,101 @@ loginForm.addEventListener('submit', async (e) => {
 // ========================================
 function togglePassword(inputId, btn) {
     const input = document.getElementById(inputId);
+    input.type = (input.type === 'password' ? 'text' : 'password');
+}
 
-    if (input.type === 'password') {
-        input.type = 'text';
+// ========================================
+// LANGUAGE TOGGLE
+// ========================================
+function toggleLanguage() {
+    const signupLang = document.getElementById('signupLang');
+    if (signupLang) {
+        // If coming from signup dropdown
+        i18n.setLanguage(signupLang.value);
     } else {
-        input.type = 'password';
+        // Fallback to toggle logic
+        const newLang = i18n.currentLang === 'en' ? 'hi' : 'en';
+        i18n.setLanguage(newLang);
+    }
+}
+
+// ------------------ TOAST UPDATED ------------------
+function showToast(message, type = 'success', duration = 3000) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const icon = type === 'success' ? '✓' : '⚠';
+
+    toast.innerHTML = `
+        <span style="margin-right:8px;">${icon}</span>
+        <span>${message}</span>
+    `;
+
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, duration);
+}
+
+// ========================================
+// FORGOT PASSWORD MODAL
+// ========================================
+function showForgotModal() {
+    document.getElementById('forgotPwModal').classList.add('show');
+}
+
+function closeForgotModal() {
+    document.getElementById('forgotPwModal').classList.remove('show');
+    document.getElementById('forgotStep1').style.display = 'block';
+    document.getElementById('forgotStep2').style.display = 'none';
+}
+
+async function requestOTP() {
+    const phone = document.getElementById('forgotPhone').value.trim();
+    if (!phone) return showToast("Phone number required", "error");
+
+    try {
+        const data = await apiFetch("/auth/forgot", {
+            method: "POST",
+            body: JSON.stringify({ phone })
+        });
+        
+        showToast("OTP generated successfully!");
+        
+        // 🔥 FEATURE 1 (REF): SHOW OTP IN TOAST
+        if (data.otp) {
+            setTimeout(() => {
+                showToast(`YOUR OTP: ${data.otp}`, "success", 15000); // Keep for 15s
+            }, 1000);
+        }
+
+        document.getElementById('forgotStep1').style.display = 'none';
+        document.getElementById('forgotStep2').style.display = 'block';
+    } catch (err) {
+        showToast(err.message, "error");
+    }
+}
+
+async function resetPassword() {
+    const phone = document.getElementById('forgotPhone').value.trim();
+    const otp = document.getElementById('otpInput').value.trim();
+    const newPassword = document.getElementById('newPassword').value;
+
+    if (!otp || !newPassword) return showToast("All fields required", "error");
+
+    try {
+        await apiFetch("/auth/reset", {
+            method: "POST",
+            body: JSON.stringify({ phone, otp, newPassword })
+        });
+        
+        showToast("Password reset successful! Please login.");
+        closeForgotModal();
+    } catch (err) {
+        showToast(err.message, "error");
     }
 }

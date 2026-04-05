@@ -81,6 +81,38 @@ exports.activatePolicy = async (req, res) => {
         }
 
         const pendingPolicyData = doc.data();
+        const premium = parseFloat(pendingPolicyData.premium);
+
+        // --- FEATURE 6: WALLET DEDUCTION ---
+        const walletRef = db.collection('wallets').doc(userId);
+        const walletDoc = await walletRef.get();
+
+        if (!walletDoc.exists) {
+            return res.status(400).json({ error: "No wallet found. Please fund your wallet first." });
+        }
+
+        const walletData = walletDoc.data();
+        const currentBalance = walletData.balance || 0;
+
+        if (currentBalance < premium) {
+            return res.status(400).json({ error: "Insufficient wallet balance to activate policy." });
+        }
+
+        // Deduct from wallet
+        const newBalance = currentBalance - premium;
+        const history = walletData.history || [];
+        history.unshift({
+            amount: -premium,
+            type: "DEDUCTION",
+            description: `Policy Premium - ${pendingPolicyData.platform}`,
+            date: new Date()
+        });
+
+        // Use a transaction for safety if possible, but simple update for now as per base code style
+        await walletRef.update({
+            balance: newBalance,
+            history: history
+        });
 
         // Create the actual policy
         const policy = {
@@ -89,7 +121,7 @@ exports.activatePolicy = async (req, res) => {
             premium: pendingPolicyData.premium,
             zone: pendingPolicyData.zone,
             platform: pendingPolicyData.platform,
-            paymentMethod: paymentMethod,
+            paymentMethod: paymentMethod || "Wallet",
             status: "active",
             createdAt: new Date()
         };
@@ -99,7 +131,12 @@ exports.activatePolicy = async (req, res) => {
         // Delete pending
         await db.collection('pending_policies').doc(userId).delete();
 
-        res.json({ success: true, policy });
+        res.json({ 
+            success: true, 
+            message: "Policy activated and premium deducted from wallet.",
+            policy,
+            newBalance
+        });
 
     } catch (err) {
         console.error("ACTIVATE POLICY ERROR:", err);

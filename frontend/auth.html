@@ -10,27 +10,29 @@
 <body>
     <div class="background-glow top-left"></div>
     <div class="background-glow bottom-right"></div>
-
+    
+    <div class="background-glow bottom-right"></div>
+    
     <div class="auth-wrapper">
         <div class="auth-card">
-            <div class="logo">Gig<span>Guard</span></div>
+            <div class="logo">Polysure <span data-i18n="logo_guard">AI</span></div>
             
             <div class="tabs">
                 <div class="tab-indicator"></div>
-                <button id="loginTab" class="tab active" type="button" onclick="switchTheme('login')">Login</button>
-                <button id="signupTab" class="tab" type="button" onclick="switchTheme('signup')">Sign Up</button>
+                <button id="loginTab" class="tab active" type="button" onclick="switchTheme('login')" data-i18n="login_title">Login</button>
+                <button id="signupTab" class="tab" type="button" onclick="switchTheme('signup')" data-i18n="signup_title">Sign Up</button>
             </div>
 
             <!-- LOGIN -->
             <form id="loginForm" class="auth-form active">
-                <h2 class="form-title">Login</h2>
+                <h2 class="form-title" data-i18n="login_title">Login</h2>
                 
                 <div class="input-group">
-                    <input type="text" id="loginEmail" placeholder="Email or Phone">
+                    <input type="text" id="loginEmail" placeholder="Email or Phone" data-i18n="email_phone_placeholder">
                 </div>
                 
                 <div class="input-group password-group">
-                    <input type="password" id="loginPassword" placeholder="Password">
+                    <input type="password" id="loginPassword" placeholder="Password" data-i18n="password_placeholder">
                     <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)">
                         <svg viewBox="0 0 24 24" fill="none" class="eye-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -39,31 +41,35 @@
                     </button>
                 </div>
 
+                <div class="forgot-pw-link">
+                    <a href="#" onclick="showForgotModal()" data-i18n="forgot_password">Forgot Password?</a>
+                </div>
+
                 <button type="submit" class="primary-btn" id="loginBtn">
-                    <span class="btn-text">Login</span>
+                    <span class="btn-text" data-i18n="login_btn">Login</span>
                     <span class="btn-loader"></span>
                 </button>
 
                 <p class="switch-text">
-                    Don't have an account? <span onclick="switchTheme('signup')">Switch to Sign Up</span>
+                    <span data-i18n="no_account">Don't have an account?</span> <span onclick="switchTheme('signup')" data-i18n="switch_signup">Switch to Sign Up</span>
                 </p>
             </form>
 
             <!-- SIGN UP -->
             <form id="signupForm" class="auth-form">
-                <h2 class="form-title">Join Polysure AI</h2>
+                <h2 class="form-title" data-i18n="signup_title">Join Polysure AI</h2>
                 
                 <div class="input-group">
-                    <input type="text" id="name" placeholder="Full Name">
+                    <input type="text" id="name" placeholder="Full Name" data-i18n="name_placeholder">
                 </div>
                 
                 <div class="input-group">
-                    <input type="tel" id="phone" placeholder="Phone Number">
+                    <input type="tel" id="phone" placeholder="Phone Number" data-i18n="phone_placeholder">
                 </div>
 
                 <div class="input-group">
                     <select id="platform">
-                        <option value="" disabled selected>Delivery Platform</option>
+                        <option value="" disabled selected data-i18n="platform_placeholder">Delivery Platform</option>
                         <option value="Zomato">Zomato</option>
                         <option value="Swiggy">Swiggy</option>
                         <option value="Blinkit">Blinkit</option>
@@ -74,15 +80,25 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="zone" placeholder="Work Zone (e.g. Bhubaneswar - Patia)">
+                    <input type="text" id="zone" placeholder="Work Zone (e.g. Bhubaneswar - Patia)" data-i18n="zone_placeholder">
                 </div>
 
                 <div class="input-group">
-                    <input type="number" id="income" placeholder="Average Daily Income (₹)">
+                    <input type="number" id="income" placeholder="Average Daily Income (₹)" data-i18n="income_placeholder">
+                </div>
+
+                <div class="input-group" id="signupLangGroup">
+                    <select id="signupLang" onchange="toggleLanguage()">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                        <option value="bn">বাংলা (Bengali)</option>
+                        <option value="te">తెలుగు (Telugu)</option>
+                    </select>
                 </div>
                 
                 <div class="input-group password-group">
-                    <input type="password" id="signupPassword" placeholder="Password">
+                    <input type="password" id="signupPassword" placeholder="Password" data-i18n="password_placeholder">
                     <button type="button" class="toggle-password" onclick="togglePassword('signupPassword', this)">
                         <svg viewBox="0 0 24 24" fill="none" class="eye-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -92,20 +108,47 @@
                 </div>
 
                 <button type="submit" class="primary-btn" id="signupBtn">
-                    <span class="btn-text">Create Account</span>
+                    <span class="btn-text" data-i18n="signup_btn">Create Account</span>
                     <span class="btn-loader"></span>
                 </button>
 
                 <p class="switch-text">
-                    Already have an account? <span onclick="switchTheme('login')">Switch to Login</span>
+                    <span data-i18n="has_account">Already have an account?</span> <span onclick="switchTheme('login')" data-i18n="switch_login">Switch to Login</span>
                 </p>
             </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPwModal" class="forgot-modal-overlay">
+        <div class="forgot-modal">
+            <h2 data-i18n="reset_password_title">Reset Password</h2>
+            
+            <div id="forgotStep1">
+                <div class="input-group">
+                    <input type="tel" id="forgotPhone" placeholder="Phone Number" data-i18n="phone_placeholder">
+                </div>
+                <button class="primary-btn" onclick="requestOTP()">Send OTP</button>
+            </div>
+
+            <div id="forgotStep2" style="display: none;">
+                <div class="input-group">
+                    <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" data-i18n="otp_placeholder">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="newPassword" placeholder="New Password" data-i18n="new_password_placeholder">
+                </div>
+                <button class="primary-btn" onclick="resetPassword()" data-i18n="reset_btn">Verify & Reset</button>
+            </div>
+            
+            <button class="btn-close-modal" onclick="closeForgotModal()" data-i18n="cancel">Cancel</button>
         </div>
     </div>
 
     <!-- Toast Notification System -->
     <div id="toast-container"></div>
 
+    <script src="js/translations.js"></script>
     <script src="js/auth.js"></script>
 </body>
 </html>

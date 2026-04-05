@@ -13,6 +13,12 @@ function logout(e) {
     window.location.href = "auth.html";
 }
 
+// ------------------ LANGUAGE ------------------
+function toggleLanguage() {
+    const newLang = i18n.currentLang === 'en' ? 'hi' : 'en';
+    i18n.setLanguage(newLang);
+}
+
 let userProfile = null;
 
 // ================== USER GREETING ==================
@@ -29,7 +35,8 @@ async function loadUser() {
             const photo = data.profile.photo;
 
             if (userName && document.getElementById("userGreeting")) {
-                document.getElementById("userGreeting").innerText = `Hello, ${userName}! 👋`;
+                const hello = i18n.translate("hello");
+                document.getElementById("userGreeting").innerHTML = `<span data-i18n="hello">${hello}</span>, ${userName}! 👋`;
             }
 
             if (photo && document.getElementById("profileImage")) {

@@ -138,6 +138,29 @@
             transition: 0.3s;
         }
 
+        .nav-links .logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            font-size: 0.85rem;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+        }
+        .lang-toggle:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
@@ -611,9 +634,12 @@
             <span></span>
         </div>
         <div class="nav-links" id="navLinks">
-            <a href="dashboard.html" class="active">Dashboard</a>
-            <a href="buy-policy.html">Buy Policy</a>
-            <a href="#" class="logout" onclick="logout(event)">Logout</a>
+            <div class="lang-toggle" onclick="toggleLanguage()">
+                <span id="langToggleText">हिन्दी</span>
+            </div>
+            <a href="dashboard.html" class="active" data-i18n="nav_dashboard">Dashboard</a>
+            <a href="buy-policy.html" data-i18n="nav_buy_policy">Buy Policy</a>
+            <a href="#" class="logout" onclick="logout(event)" data-i18n="nav_logout">Logout</a>
         </div>
     </nav>
 
@@ -635,8 +661,8 @@
     </div>
 
     <div class="user-info">
-        <h1 class="greeting" id="userGreeting">Hello! 👋</h1>
-        <p class="sub-greeting">Welcome back to your dashboard.</p>
+        <h1 class="greeting" id="userGreeting"><span data-i18n="hello">Hello!</span> 👋</h1>
+        <p class="sub-greeting" data-i18n="welcome_back">Welcome back to your dashboard.</p>
     </div>
 </section>
 
@@ -645,16 +671,16 @@
             <!-- Card 1 -->
             <div class="glass-card summary-card">
                 <div>
-                    <h3>Policy Status</h3>
-                    <div class="value" id="policyStatus" style="color: var(--text-muted)">Loading...</div>
+                    <h3 data-i18n="policy_status">Policy Status</h3>
+                    <div class="value" id="policyStatus" style="color: var(--text-muted)" data-i18n="loading">Loading...</div>
                 </div>
-                <a href="buy-policy.html" class="btn" id="buyPolicyBtn" style="width: 100%;">Buy Policy</a>
+                <a href="buy-policy.html" class="btn" id="buyPolicyBtn" style="width: 100%;" data-i18n="buy_policy">Buy Policy</a>
             </div>
 
             <!-- Card 2 -->
             <div class="glass-card summary-card">
                 <div>
-                    <h3>Coverage Amount</h3>
+                    <h3 data-i18n="coverage_amount">Coverage Amount</h3>
                     <div class="value" id="policyCoverage" style="color: var(--text-muted)">--</div>
                 </div>
             </div>
@@ -662,7 +688,7 @@
             <!-- Card 3 -->
             <div class="glass-card summary-card">
                 <div>
-                    <h3>Weekly Premium</h3>
+                    <h3 data-i18n="weekly_premium">Weekly Premium</h3>
                     <div class="value" id="policyPremium" style="color: var(--text-muted)">--</div>
                 </div>
             </div>
@@ -670,10 +696,10 @@
             <!-- Card 4 -->
             <div class="glass-card summary-card">
                 <div>
-                    <h3>Wallet Balance</h3>
+                    <h3 data-i18n="wallet_balance">Wallet Balance</h3>
                     <div class="value" id="walletBalance">₹0</div>
                 </div>
-                <button class="btn btn-outline" style="width: 100%;" onclick="withdrawFunds()">Withdraw</button>
+                <button class="btn btn-outline" style="width: 100%;" onclick="withdrawFunds()" data-i18n="withdraw">Withdraw</button>
             </div>
         </section>
 
@@ -685,15 +711,15 @@
                 
                 <!-- 3. Policy Details Panel -->
                 <div class="glass-card policy-details" id="policyDetailsPanel">
-                    <h2>Insurance Policy Details</h2>
-                    <p class="message" id="policyMessage">Loading your policy details...</p>
-                    <a href="buy-policy.html" class="btn" id="panelBuyBtn">Buy Policy</a>
+                    <h2 data-i18n="policy_details_title">Insurance Policy Details</h2>
+                    <p class="message" id="policyMessage" data-i18n="loading">Loading your policy details...</p>
+                    <a href="buy-policy.html" class="btn" id="panelBuyBtn" data-i18n="buy_policy">Buy Policy</a>
                     <p class="supporting-text">Activate a dynamic parametric insurance policy to protect your income during disruptions.</p>
                 </div>
 
                 <!-- 4. Wallet & Claim History -->
                 <div class="glass-card history-section">
-                    <h2>Wallet & Claim History</h2>
+                    <h2 data-i18n="history_title">Wallet & Claim History</h2>
                     <div class="history-list" id="historyList">
                         <!-- Dynamically populated from backend -->
                         <div style="color: var(--text-muted); font-size: 0.9rem;">No recent history.</div>
@@ -707,23 +733,38 @@
                 
                 <!-- 5. Zone Risk Status -->
                 <div class="glass-card zone-card">
-                    <h2 class="zone-section">Zone Risk Status</h2>
+                    <h2 class="zone-section" data-i18n="zone_risk_title">Zone Risk Status</h2>
                     
                     <div class="zone-info">
-                        <span class="zone-label">Zone</span>
+                        <span class="zone-label" data-i18n="zone_label">Zone</span>
                         <span class="zone-value">Patia</span>
                     </div>
 
                     <div class="zone-info">
-                        <span class="zone-label">Current Risk Level</span>
+                        <span class="zone-label" data-i18n="current_risk">Current Risk Level</span>
                         <div class="risk-indicator" id="riskBadge">LOW</div>
                     </div>
 
-                    <p class="zone-desc">This status reflects real-time environmental risk signals monitored by the system.</p>
+                    <p class="zone-desc" data-i18n="risk_desc">This status reflects real-time environmental risk signals monitored by the system.</p>
                     
-                    <button class="btn-report-emergency" onclick="openEmergencyModal()">
+                    <button class="btn-report-emergency" onclick="openEmergencyModal()" data-i18n="report_emergency">
                         🚨 Report Emergency
                     </button>
+                </div>
+
+                <!-- 6. Language Preferences -->
+                <div class="glass-card preference-card">
+                    <h2 data-i18n="language_pref_title">Language Preferences</h2>
+                    <p class="zone-desc" data-i18n="language_pref_desc">Choose your preferred language for the dashboard and notifications.</p>
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <select id="dashboardLang" onchange="i18n.setLanguage(this.value)" style="width: 100%; padding: 0.8rem; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: white;">
+                            <option value="en">English</option>
+                            <option value="hi">हिन्दी (Hindi)</option>
+                            <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                            <option value="bn">বাংলা (Bengali)</option>
+                            <option value="te">తెలుగు (Telugu)</option>
+                        </select>
+                    </div>
                 </div>
 
             </div>
@@ -733,8 +774,8 @@
     <!-- Emergency Selection Modal -->
     <div class="emergency-modal-overlay" id="emergencyModal">
         <div class="emergency-modal">
-            <h2>Report Emergency</h2>
-            <p>Select the type of disaster occurring in your current zone.</p>
+            <h2 data-i18n="emergency_modal_title">Report Emergency</h2>
+            <p data-i18n="emergency_modal_desc">Select the type of disaster occurring in your current zone.</p>
             
             <div class="disaster-options">
                 <button class="disaster-btn" onclick="submitEmergency('Severe Flood')">
@@ -751,7 +792,7 @@
                 </button>
             </div>
             
-            <button class="btn-close-modal" onclick="closeEmergencyModal()">Cancel Report</button>
+            <button class="btn-close-modal" onclick="closeEmergencyModal()" data-i18n="cancel">Cancel Report</button>
         </div>
     </div>
 
@@ -759,6 +800,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JavaScript -->
+    <script src="js/translations.js"></script>
     <script src="js/dashboard.js"></script>
   
 </body>
